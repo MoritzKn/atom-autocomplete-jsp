@@ -1,0 +1,44 @@
+{
+  "name": "autocomplete-jsp",
+  "main": "src/main.js",
+  "version": "0.0.0",
+  "description": "Atom autocomplete+ provider for JSP / JSPX",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/MoritzKn/atom-autocomplete-jsp.git"
+  },
+  "author": "Moritz Kneilmann <moritz.kneilmann@gmx.de>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MoritzKn/atom-autocomplete-jsp/issues"
+  },
+  "homepage": "https://github.com/MoritzKn/atom-autocomplete-jsp#readme",
+  "keywords": [
+    "autocomplete",
+    "autocomplete-plus",
+    "jsp",
+    "jspx",
+    "java",
+    "server",
+    "pages"
+  ],
+  "scripts": {
+    "test": "./node_modules/jshint/bin/jshint src/*.js src/**/*.js"
+  },
+  "engines": {
+    "atom": ">=1.0.0"
+  },
+  "dependencies": {
+    "xml2js": "^0.4.17"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "getProviders"
+      }
+    }
+  },
+  "devDependencies": {
+    "jshint": "^2.9.3"
+  }
+}
