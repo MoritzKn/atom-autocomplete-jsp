@@ -1,11 +1,10 @@
 'use babel';
 
-import {mergeCompletions} from './utils';
+import {mergeCompletions, getCompletionPrefix} from './utils';
 
 import {getImplicitElObjects} from './sources/implicitObject';
 import {getElKeywords} from './sources/keywords';
 import {getElFunctions} from './sources/tlds';
-
 
 export default {
     loadData: () => {
@@ -22,9 +21,25 @@ export default {
     inclusionPriority: 1001,
     excludeLowerPriority: true, // maybe..?
 
-    getSuggestions: mergeCompletions([
-        getImplicitElObjects,
-        getElKeywords,
-        getElFunctions,
-    ]),
+    getSuggestions: options => {
+        const prefix = getCompletionPrefix(options.editor, options.bufferPosition);
+
+        if (!prefix) {
+            return [];
+        }
+
+        options.prefix = prefix;
+
+        const suggestions = mergeCompletions([
+            getImplicitElObjects,
+            getElKeywords,
+            getElFunctions,
+        ])(options);
+
+        suggestions.forEach(suggestion => {
+            suggestion.replacementPrefix = prefix;
+        });
+
+        return suggestions;
+    },
 };

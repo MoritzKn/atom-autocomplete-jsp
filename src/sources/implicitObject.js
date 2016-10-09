@@ -1,7 +1,7 @@
 'use babel';
 
 import {varDesc} from '../dataClasses';
-import {mkSimpleSuggestionFilter, getCompletionPrefix} from '../utils';
+import {mkSimpleSuggestionFilter} from '../utils';
 
 const implicitObjects = [
      new varDesc({
@@ -34,20 +34,13 @@ const implicitObjects = [
     }),
 ];
 
-export const getImplicitElObjects = ({editor, bufferPosition}) => {
-    const prefix = getCompletionPrefix(editor, bufferPosition);
-
-    if (!prefix) {
-        return [];
-    }
-
+export const getImplicitElObjects = ({editor, prefix}) => {
     const filter = mkSimpleSuggestionFilter(prefix);
     const type = 'variable';
 
     return implicitObjects
         .filter(varDesc => filter(varDesc.name))
         .map(varDesc => ({
-            replacementPrefix: prefix,
             text: varDesc.name,
             leftLabel: varDesc.type,
             type: type,

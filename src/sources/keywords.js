@@ -1,19 +1,13 @@
 'use babel';
 
-import {mkSimpleSuggestionFilter, getCompletionPrefix} from '../utils';
+import {mkSimpleSuggestionFilter} from '../utils';
 
 const keywords = [
     'div', 'mod', 'eq', 'ne', 'lt', 'gt', 'le',
     'ge', 'and', 'or', 'not', 'empty',
 ];
 
-export const getElKeywords = ({editor, bufferPosition}) => {
-    const prefix = getCompletionPrefix(editor, bufferPosition);
-
-    if (!prefix) {
-        return [];
-    }
-
+export const getElKeywords = ({editor, prefix}) => {
     const filter = mkSimpleSuggestionFilter(prefix);
     const type = 'keyword';
 

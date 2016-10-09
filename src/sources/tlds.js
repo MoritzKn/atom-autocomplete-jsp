@@ -1,7 +1,7 @@
 'use babel';
 
 import fs from 'fs';
-import {abbreviate, getCompletionPrefix} from '../utils';
+import {abbreviate} from '../utils';
 import readInTld from '../readInTld';
 
 const getTagFunctionSnippet = fnDesc => {
@@ -45,16 +45,10 @@ Promise.all(tldPathes.map(readInTld))
         });
     });
 
-export const getElFunctions = ({editor, bufferPosition}) => {
-    let prefix = getCompletionPrefix(editor, bufferPosition);
-
-    if (!prefix) {
-        return [];
-    } else {
-        prefix = prefix.toLowerCase();
-    }
-
+export const getElFunctions = ({editor, bufferPosition, prefix}) => {
     const type = 'function';
+
+    prefix = prefix.toLowerCase();
 
     return tagFunctions
         .filter(fnDesc => {
