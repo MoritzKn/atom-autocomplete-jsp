@@ -1,7 +1,7 @@
 {
   "name": "autocomplete-jsp",
   "main": "src/main.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Atom autocomplete+ provider for JSP / JSPX",
   "repository": {
     "type": "git",
@@ -42,9 +42,11 @@
     "jshint": "^2.9.3"
   },
   "configSchema": {
-      "tldSources": {
-          "type": "array",
-          "default": ["~/.atom/packages/autocomplete-jsp/tlds"]
-      }
+    "tldSources": {
+      "type": "array",
+      "default": [
+        "~/.atom/packages/autocomplete-jsp/tlds"
+      ]
+    }
   }
 }
