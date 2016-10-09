@@ -40,5 +40,11 @@
   },
   "devDependencies": {
     "jshint": "^2.9.3"
+  },
+  "configSchema": {
+      "tldSources": {
+          "type": "array",
+          "default": ["~/.atom/packages/autocomplete-jsp/tlds"]
+      }
   }
 }

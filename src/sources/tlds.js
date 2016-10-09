@@ -14,16 +14,18 @@ const getTagFunctionSnippet = fnDesc => {
     return `${ns}:${name}(${args})`;
 };
 
-// TODO: use config
-// atom.config.get('autocomplete-jsp.tldSources')
-const packagePath = atom.packages.getPackageDirPaths() + '/autocomplete-jsp';
-const dir = `${packagePath}/tlds`;
-const tldPathes = fs.readdirSync(dir).map(fileName =>
-        `${dir.replace(/\/$/, '')}/${fileName}`);
+let tldPathes = [];
+// TODO: refresh on config change
+atom.config.get('autocomplete-jsp.tldSources').forEach(dir => {
+     fs.readdirSync(dir).forEach(fileName => {
+         const path = `${dir.replace(/\/$/, '')}/${fileName}`;
+         tldPathes.push(path);
+     });
+});
 
 let tagFunctions = [];
 
-// TODO: if a tld changes, we have to some how reload it..
+// TODO: when a tld changes, we have to some how reload it..
 Promise.all(tldPathes.map(readInTld))
     .then(tldDescs => {
         tldDescs.forEach(tldDesc => {
