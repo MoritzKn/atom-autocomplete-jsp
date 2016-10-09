@@ -5,6 +5,7 @@ import {mergeCompletions, getCompletionPrefix} from './utils';
 import {getImplicitElObjects} from './sources/implicitObject';
 import {getElKeywords} from './sources/keywords';
 import {getElFunctions} from './sources/tlds';
+import {getVaribles} from './sources/tags';
 
 export default {
     loadData: () => {
@@ -34,6 +35,7 @@ export default {
             getImplicitElObjects,
             getElKeywords,
             getElFunctions,
+            getVaribles,
         ])(options);
 
         suggestions.forEach(suggestion => {
