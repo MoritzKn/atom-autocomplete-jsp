@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [0.1.1] 2016-10-09
+## [0.2.0] 2016-10-09
 ### Added
 - Mechanism to load tlds from a directories specified in the config
 - Autocompletion for varibles defined in tags such as `<c:set var"foo" value="bar"/>`
