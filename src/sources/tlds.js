@@ -14,9 +14,13 @@ const getTagFunctionSnippet = fnDesc => {
     return `${ns}:${name}(${args})`;
 };
 
+const userHome = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+
 let tldPathes = [];
 // TODO: refresh on config change
 atom.config.get('autocomplete-jsp.tldSources').forEach(dir => {
+     dir = dir.replace('~', userHome);
+
      fs.readdirSync(dir).forEach(fileName => {
          const path = `${dir.replace(/\/$/, '')}/${fileName}`;
          tldPathes.push(path);
