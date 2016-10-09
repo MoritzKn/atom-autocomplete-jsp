@@ -1,48 +1,71 @@
 'use babel';
 
-import {varDesc} from '../dataClasses';
-import {mkSimpleSuggestionFilter} from '../utils';
+import {add as addToRegistry} from '../registry';
+import {VarDesc} from '../dataClasses';
 
 const implicitObjects = [
-     new varDesc({
-        name: 'request',
-        type: 'HttpServletRequest'
-    }), new varDesc({
-        name: 'response',
-        type: 'HttpServletResponse'
-    }), new varDesc({
-        name: 'out',
-        type: 'PrintWriter'
-    }), new varDesc({
-        name: 'session',
-        type: 'HttpSession'
-    }), new varDesc({
-        name: 'application',
-        type: 'ServletContext'
-    }), new varDesc({
-        name: 'config',
-        type: 'ServletConfig'
-    }), new varDesc({
+    new VarDesc({
         name: 'pageContext',
-        type: 'PageContext'
-    }), new varDesc({
-        name: 'page',
-        type: 'Object'
-    }), new varDesc({
-        name: 'exception',
-        type: 'Throwable'
+        type: 'PageContext',
+        description: 'The context for the JSP page.',
+    }),
+    new VarDesc({
+        name: 'param',
+        type: 'Map',
+        description: 'Maps a request parameter name to a single value.',
+    }),
+    new VarDesc({
+        name: 'paramValues',
+        type: 'Map',
+        description: 'Maps a request parameter name to an array of values.',
+    }),
+    new VarDesc({
+        name: 'header',
+        type: 'Map',
+        description: 'Maps a request header name to a single value.',
+    }),
+    new VarDesc({
+        name: 'headerValues',
+        type: 'Map',
+        description: 'Maps a request header name to an array of values.',
+    }),
+    new VarDesc({
+        name: 'cookie',
+        type: 'Map',
+        description: 'Maps a cookie name to a single cookie.',
+    }),
+    new VarDesc({
+        name: 'initParam',
+        type: 'Map',
+        description: 'Maps a context initialization parameter name to a single value.',
+    }),
+    new VarDesc({
+        name: 'pageScope',
+        type: 'Map',
+        description: 'Maps page-scoped variable names to their values.',
+    }),
+    new VarDesc({
+        name: 'requestScope',
+        type: 'Map',
+        description: 'Maps request-scoped variable names to their values.',
+    }),
+    new VarDesc({
+        name: 'sessionScope',
+        type: 'Map',
+        description: 'Maps session-scoped variable names to their values.',
+    }),
+    new VarDesc({
+        name: 'applicationScope',
+        type: 'Map',
+        description: 'Maps application-scoped variable names to their values.',
     }),
 ];
 
-export const getImplicitElObjects = ({editor, prefix}) => {
-    const filter = mkSimpleSuggestionFilter(prefix);
-    const type = 'variable';
-
-    return implicitObjects
-        .filter(varDesc => filter(varDesc.name))
-        .map(varDesc => ({
-            text: varDesc.name,
-            leftLabel: varDesc.type,
-            type: type,
-        }));
-};
+export function register() {
+    implicitObjects.forEach(el => {
+        addToRegistry({
+            element: el,
+            liveTime: Infinity,
+        });
+    });
+}

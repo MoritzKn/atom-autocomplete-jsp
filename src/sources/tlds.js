@@ -1,74 +1,49 @@
 'use babel';
 
 import fs from 'fs';
-import {abbreviate} from '../utils';
 import readInTld from '../readInTld';
+import {add as addToRegistry} from '../registry';
 
-const getTagFunctionSnippet = fnDesc => {
-    const ns = fnDesc.namespace;
-    const name = fnDesc.name;
-    const args = fnDesc.argumentTypes
-        .map((type, i) => `\${${i + 1}:${type}}`)
-        .join(', ');
 
-    return `${ns}:${name}(${args})`;
-};
+export function register() {
+    const userHome = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 
-const userHome = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+    let tldPathes = [];
+    // TODO: refresh on config change
+    atom.config.get('autocomplete-jsp.tldSources').forEach(dir => {
+        dir = dir.replace('~', userHome);
 
-let tldPathes = [];
-// TODO: refresh on config change
-atom.config.get('autocomplete-jsp.tldSources').forEach(dir => {
-     dir = dir.replace('~', userHome);
-
-     fs.readdirSync(dir).forEach(fileName => {
-         const path = `${dir.replace(/\/$/, '')}/${fileName}`;
-         tldPathes.push(path);
-     });
-});
-
-let tagFunctions = [];
-
-// TODO: when a tld changes, we have to some how reload it..
-Promise.all(tldPathes.map(readInTld))
-    .then(tldDescs => {
-        tldDescs.forEach(tldDesc => {
-            tldDesc.functions.forEach(fnDesc => {
-                tagFunctions.push(fnDesc);
-            });
-        });
-    })
-    .catch(err => {
-        atom.notifications.addWarning(err.msg, {
-            dismissable: true,
-            detail: `Caused by:\n${err.causedBy}`,
+        fs.readdirSync(dir).forEach(fileName => {
+            const path = `${dir.replace(/\/$/, '')}/${fileName}`;
+            tldPathes.push(path);
         });
     });
 
-export const getElFunctions = ({editor, bufferPosition, prefix}) => {
-    const type = 'function';
+    // TODO: when a tld changes, we have to some how reload it..
+    Promise.all(tldPathes.map(readInTld))
+        .then(tldDescs => {
+            tldDescs.forEach(tldDesc => {
+                tldDesc.functions.forEach(fnDesc => {
+                    addToRegistry({
+                        element: fnDesc,
+                        // TODO: not Infinity
+                        liveTime: Infinity,
+                    });
+                });
 
-    prefix = prefix.toLowerCase();
-
-    return tagFunctions
-        .filter(fnDesc => {
-            const abbreviatedName = abbreviate(fnDesc.name);
-
-            if (fnDesc.namespace.startsWith(prefix) || prefix.startsWith(fnDesc.namespace)) {
-                const test1 = `${fnDesc.namespace}:${fnDesc.name}`;
-                const test2 = `${fnDesc.namespace}:${abbreviatedName}`;
-                return test1.startsWith(prefix) || test2.startsWith(prefix);
-            } else {
-                const test1 = `${fnDesc.name}`;
-                const test2 = `${abbreviatedName}`;
-                return test1.startsWith(prefix) || test2.startsWith(prefix);
-            }
+                tldDesc.tags.forEach(tagDesc => {
+                    addToRegistry({
+                        element: tagDesc,
+                        // TODO: not Infinity
+                        liveTime: Infinity,
+                    });
+                });
+            });
         })
-        .map(fnDesc => ({
-            replacementPrefix: prefix,
-            snippet: getTagFunctionSnippet(fnDesc),
-            leftLabel: fnDesc.returnType,
-            description: fnDesc.description,
-            type: type,
-        }));
-};
+        .catch(err => {
+            atom.notifications.addWarning(err.msg, {
+                dismissable: true,
+                detail: `Caused by:\n${err.causedBy}`,
+            });
+        });
+}

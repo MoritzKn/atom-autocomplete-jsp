@@ -3,7 +3,7 @@
 import fs from 'fs';
 import xml2js from 'xml2js';
 
-import {TaglibDesc, FunctionDesc, TagDesc, TagAttrDesc} from './dataClasses';
+import {TaglibDesc, TagFunctionDesc, TagDesc, TagAttrDesc} from './dataClasses';
 import {shortType} from './utils.js';
 
 const parseFnSignature = signature => {
@@ -53,15 +53,15 @@ const taglibToDesc = taglib => {
         const signature = getPropSave(fnInfo, 'function-signature', 0);
         const {returnType, argumentTypes} = parseFnSignature(signature);
 
-        return new FunctionDesc({
+        return new TagFunctionDesc({
             name: getPropSave(fnInfo, 'name', 0),
             class: getPropSave(fnInfo, 'function-class', 0),
             description: getPropSave(fnInfo, 'description', 0),
             example: getPropSave(fnInfo, 'example', 0),
-            signature: signature,
-            returnType: returnType,
-            argumentTypes: argumentTypes,
             namespace: shortName,
+            signature,
+            returnType,
+            argumentTypes,
         });
     });
 
@@ -116,17 +116,7 @@ export default path => {
                     });
                 }
 
-                let taglibDesc;
-
-                try {
-                    taglibDesc = taglibToDesc(taglib);
-                } catch(err) {
-                    return reject({
-                        msg: `Parsing tld '${path}' failed`,
-                        causedBy: err,
-                    });
-                }
-
+                const taglibDesc = taglibToDesc(taglib);
                 return resolve(taglibDesc);
             });
         });

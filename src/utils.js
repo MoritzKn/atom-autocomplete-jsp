@@ -7,7 +7,7 @@
  * @param  {string} prefix - completion prefix, should be lower case
  * @return {boolean}       - add suggestion?
  */
-const check = (name, prefix) => {
+export const check = (name, prefix) => {
     if (!name || !prefix) {
         return false;
     }
@@ -19,13 +19,6 @@ const check = (name, prefix) => {
 export const abbreviate = fullName =>
     fullName.match(/^.|[A-Z]/g).join('').toLowerCase();
 
-export const mkSimpleSuggestionFilter = prefix => {
-    prefix = prefix.trim().toLowerCase();
-
-    return name => check(name, prefix) ||
-                   check(abbreviate(name), prefix);
-};
-
 
 export const getCompletionPrefix = (editor, bufferPosition) => {
     const {expression, courserPos} = getExpressionInfo(editor, bufferPosition);
@@ -36,7 +29,10 @@ export const getCompletionPrefix = (editor, bufferPosition) => {
     if (!match) {
         return null;
     } else {
-        return match[0];
+        const prefix = match[0];
+        if (prefix) {
+            return prefix.toLowerCase();
+        }
     }
 };
 

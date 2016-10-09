@@ -1,17 +1,10 @@
 'use babel';
 
-import {mergeCompletions, getCompletionPrefix} from './utils';
-
-import {getImplicitElObjects} from './sources/implicitObject';
-import {getElKeywords} from './sources/keywords';
-import {getElFunctions} from './sources/tlds';
-import {getVaribles} from './sources/tags';
+import {getCompletionPrefix} from './utils';
+import {getAll as getRegistryElements} from './registry';
+import {TagFunctionDesc, VarDesc, KeywordDesc} from './dataClasses';
 
 export default {
-    loadData: () => {
-
-    },
-
     selector: '.text.html.jsp .el_expression',
     disableForSelector: '.el_expression .string',
     /*
@@ -29,19 +22,12 @@ export default {
             return [];
         }
 
-        options.prefix = prefix;
-
-        const suggestions = mergeCompletions([
-            getImplicitElObjects,
-            getElKeywords,
-            getElFunctions,
-            getVaribles,
-        ])(options);
-
-        suggestions.forEach(suggestion => {
-            suggestion.replacementPrefix = prefix;
-        });
-
-        return suggestions;
+        return getRegistryElements()
+            .filter(elDesc =>
+                    elDesc instanceof TagFunctionDesc ||
+                    elDesc instanceof VarDesc ||
+                    elDesc instanceof KeywordDesc)
+            .filter(elDesc => elDesc.filter(prefix))
+            .map(elDesc => elDesc.suggestion(prefix));
     },
 };
