@@ -7,16 +7,15 @@ This package is in a very early stage.
 
 ## Features
 - EL autocompletion for implicit objects
-- EL autocompletion based on TLD Files
+- EL autocompletion based on `.tld` files
 
 ## Goals
-- Tag autocompletion based on TLD Files
-- EL autocompletion for varibles defined in Tags
+- Tag autocompletion based on `.tld` files
+- EL autocompletion for varibles defined in tags such as `<c:set var"foo" value="bar"/>`
 - EL autocompletion for imported beans
 
-## What this package doesn't
-- Autocomplete embedded Java Code
+## What this package won't do
+- Autocomplete embedded Java code
 
-
-## config
+## Config
 - `tldSources`: array of directories containing tld files
