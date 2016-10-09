@@ -1,7 +1,7 @@
 'use babel';
 
 import fs from 'fs';
-import {mkSimpleSuggestionFilter, getCompletionPrefix} from '../utils';
+import {abbreviate, getCompletionPrefix} from '../utils';
 import readInTld from '../readInTld';
 
 const getTagFunctionSnippet = fnDesc => {
@@ -33,22 +33,37 @@ Promise.all(tldPathes.map(readInTld))
         });
     })
     .catch(err => {
-        console.error(err);
+        atom.notifications.addWarning(err.msg, {
+            dismissable: true,
+            detail: `Caused by:\n${err.causedBy}`,
+        });
     });
 
 export const getElFunctions = ({editor, bufferPosition}) => {
-    const prefix = getCompletionPrefix(editor, bufferPosition);
+    let prefix = getCompletionPrefix(editor, bufferPosition);
 
     if (!prefix) {
         return [];
+    } else {
+        prefix = prefix.toLowerCase();
     }
 
-    const filter = mkSimpleSuggestionFilter(prefix);
     const type = 'function';
 
     return tagFunctions
-        .filter(fnDesc =>
-            filter(fnDesc.namespace + ':' + fnDesc.name))
+        .filter(fnDesc => {
+            const abbreviatedName = abbreviate(fnDesc.name);
+
+            if (fnDesc.namespace.startsWith(prefix) || prefix.startsWith(fnDesc.namespace)) {
+                const test1 = `${fnDesc.namespace}:${fnDesc.name}`;
+                const test2 = `${fnDesc.namespace}:${abbreviatedName}`;
+                return test1.startsWith(prefix) || test2.startsWith(prefix);
+            } else {
+                const test1 = `${fnDesc.name}`;
+                const test2 = `${abbreviatedName}`;
+                return test1.startsWith(prefix) || test2.startsWith(prefix);
+            }
+        })
         .map(fnDesc => ({
             replacementPrefix: prefix,
             snippet: getTagFunctionSnippet(fnDesc),

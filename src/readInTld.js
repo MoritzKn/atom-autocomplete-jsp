@@ -6,10 +6,6 @@ import xml2js from 'xml2js';
 import {TaglibDesc, FunctionDesc, TagDesc, TagAttrDesc} from './dataClasses';
 import {shortType} from './utils.js';
 
-const trimObjProps = obj => Object.keys(obj)
-    .filter(name => typeof obj[name] === 'string')
-    .forEach(name => obj[name] = obj[name].trim());
-
 const parseFnSignature = signature => {
     const matches = signature.match(RegExp(
             // return type
@@ -36,70 +32,102 @@ const parseFnSignature = signature => {
 
 const parseBool = str => str !== 'false';
 
+const getPropSave = (obj, ...path) => {
+    let lastEL = obj;
+    path.forEach(key => {
+        if (typeof lastEL !== 'object') {
+            return undefined;
+        }
+        lastEL = lastEL[key];
+    });
+    return lastEL;
+};
+
+const taglibToDesc = taglib => {
+    const shortName = getPropSave(taglib, 'short-name', 0);
+    const name = getPropSave(taglib, 'display-name', 0);
+    const description = getPropSave(taglib, 'description', 0);
+    const uri = getPropSave(taglib, 'uri', 0);
+
+    const functions = !taglib.function ? [] : taglib.function.map(fnInfo => {
+        const signature = getPropSave(fnInfo, 'function-signature', 0);
+        const {returnType, argumentTypes} = parseFnSignature(signature);
+
+        return new FunctionDesc({
+            name: getPropSave(fnInfo, 'name', 0),
+            class: getPropSave(fnInfo, 'function-class', 0),
+            description: getPropSave(fnInfo, 'description', 0),
+            example: getPropSave(fnInfo, 'example', 0),
+            signature: signature,
+            returnType: returnType,
+            argumentTypes: argumentTypes,
+            namespace: shortName,
+        });
+    });
+
+    const tags = !taglib.tag ? [] : taglib.tag.map(tagInfo => {
+        return new TagDesc({
+            name: getPropSave(tagInfo, 'name', 0),
+            class: getPropSave(tagInfo, 'tag-class', 0),
+            description: getPropSave(tagInfo, 'description', 0),
+            content: getPropSave(tagInfo, 'body-content', 0),
+            namespace: shortName,
+
+            attributes: !tagInfo.attribute ? [] : tagInfo.attribute.map(attrInfo => {
+                return new TagAttrDesc({
+                    name: getPropSave(attrInfo, 'name', 0),
+                    description: getPropSave(attrInfo, 'description', 0),
+                    type: getPropSave(attrInfo, 'type', 0),
+                    required: parseBool(getPropSave(attrInfo, 'required', 0)),
+                    rtexprvalue: parseBool(getPropSave(attrInfo, 'rtexprvalue', 0)),
+                });
+            })
+        });
+    });
+
+    let desc = new TaglibDesc({
+        description,
+        name,
+        shortName,
+        uri,
+        functions,
+        tags,
+    });
+
+    return desc;
+};
+
 export default path => {
     return new Promise((resolve, reject) => {
-        const taglibToDesc = taglib => {
-            let desc = new TaglibDesc({
-                description: !taglib.description ? '' : taglib.description[0],
-                name: taglib['display-name'][0],
-                shortName: taglib['short-name'][0],
-                uri: taglib.uri[0],
-
-                functions: !taglib.function ? [] : taglib.function.map(fnInfo => {
-                    const signature = fnInfo['function-signature'][0];
-                    const {returnType, argumentTypes} = parseFnSignature(signature);
-
-                    return new FunctionDesc({
-                        name: fnInfo.name[0],
-                        class: fnInfo['function-class'][0],
-                        description: !fnInfo.description ? '' : fnInfo.description[0],
-                        example: !fnInfo.example ? '' : fnInfo.example[0],
-                        signature: signature,
-                        returnType: returnType,
-                        argumentTypes: argumentTypes,
-                        namespace: taglib['short-name'][0],
-                    });
-                }),
-
-                tags: !taglib.tag ? [] : taglib.tag.map(tagInfo => {
-                    return new TagDesc({
-                        name: tagInfo.name[0],
-                        class: tagInfo['tag-class'][0],
-                        description: tagInfo.description[0],
-                        content: tagInfo['body-content'][0],
-
-                        attributes: !tagInfo.attribute ? [] : tagInfo.attribute.map(attrInfo => {
-                            return new TagAttrDesc({
-                                name: attrInfo.name[0],
-                                description: attrInfo.description[0],
-                                type: !attrInfo.type ? '' : attrInfo.type[0],
-                                required: parseBool(attrInfo.required[0]),
-                                rtexprvalue: parseBool(attrInfo.rtexprvalue[0]),
-                            });
-                        })
-                    });
-                })
-            });
-
-            trimObjProps(desc);
-            desc.functions.forEach(trimObjProps);
-            desc.tags.forEach(trimObjProps);
-            desc.tags.forEach(tag => tag.attributes.forEach(trimObjProps));
-
-            return resolve(desc);
-        };
 
         fs.readFile(path, {encoding: 'utf8'}, (err, content) => {
             if (err) {
-                return reject(err);
+                return reject({
+                    msg: `Reading file '${path}' failed`,
+                    causedBy: err,
+                });
             }
 
             xml2js.parseString(content, (err, {taglib}) => {
                 if (err) {
-                    return reject(err);
+                    return reject({
+                        msg: `Parsing XML in '${path}' failed`,
+                        causedBy: err,
+                    });
                 }
 
-                taglibToDesc(taglib);
+                let taglibDesc;
+
+                try {
+                    taglibDesc = taglibToDesc(taglib);
+                } catch(err) {
+                    return reject({
+                        msg: `Parsing tld '${path}' failed`,
+                        causedBy: err,
+                    });
+                }
+
+                return resolve(taglibDesc);
             });
         });
     });

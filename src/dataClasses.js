@@ -12,10 +12,10 @@ export class TaglibDesc {
      * @param {TagDesc[]}      [initData.tags]
      */
     constructor(initData={}) {
-        this.name = initData.name || '';
-        this.shortName = initData.shortName || '';
-        this.uri = initData.uri || '';
-        this.description = initData.description || '';
+        this.name = (initData.name || '').trim();
+        this.shortName = (initData.shortName || '').trim();
+        this.uri = (initData.uri || '').trim();
+        this.description = (initData.description || '').trim();
         this.functions = initData.functions || [];
         this.tags = initData.tags || [];
     }
@@ -34,50 +34,50 @@ export class FunctionDesc {
      * @param {string}   [initData.namespace]
      */
     constructor(initData={}) {
-        this.name = initData.name || '';
-        this.class = initData.class || '';
-        this.signature = initData.signature || '';
-        this.example = initData.example || '';
-        this.description = initData.description || '';
-        this.returnType = initData.returnType || '';
+        this.name = (initData.name || '').trim();
+        this.class = (initData.class || '').trim();
+        this.signature = (initData.signature || '').trim();
+        this.example = (initData.example || '').trim();
+        this.description = (initData.description || '').trim();
+        this.returnType = (initData.returnType || '').trim();
         this.argumentTypes = initData.argumentTypes || [];
-        this.namespace = initData.namespace || '';
+        this.namespace = (initData.namespace || '').trim();
     }
 }
 
 export class TagDesc {
     /**
      * @param {object} [initData]
-     * @param {string} {initData.name]
-     * @param {string} {initData.class]
-     * @param {string} {initData.description]
-     * @param {string} {initData.content]
-     * @param {TagAttrDesc[]} {initData.ttribute]
+     * @param {string} [initData.name]
+     * @param {string} [initData.class]
+     * @param {string} [initData.description]
+     * @param {string} [initData.content]
+     * @param {TagAttrDesc[]} [initData.attributes]
      */
     constructor(initData={}) {
-        this.name = initData.name || '';
-        this.class = initData.class || '';
-        this.description = initData.description || '';
-        this.content = initData.content || '';
+        this.name = (initData.name || '').trim();
+        this.class = (initData.class || '').trim();
+        this.description = (initData.description || '').trim();
+        this.content = (initData.content || '').trim();
         this.attributes = initData.attributes || [];
     }
 }
 
 export class TagAttrDesc {
     /**
-     * @param {object} [initData]
-     * @param {string} [initData.name]
-     * @param {string} [initData.description]
-     * @param {string} [initData.type]
-     * @param {string} [initData.required]
-     * @param {string} [initData.rtexprvalue]
+     * @param {object}  [initData]
+     * @param {string}  [initData.name]
+     * @param {string}  [initData.description]
+     * @param {string}  [initData.type]
+     * @param {boolean} [initData.required]
+     * @param {boolean} [initData.rtexprvalue]
      */
     constructor(initData={}) {
-        this.name = initData.name || '';
-        this.description = initData.description || '';
-        this.type = initData.type || '';
-        this.required = initData.required || '';
-        this.rtexprvalue = initData.rtexprvalue || '';
+        this.name = (initData.name || '').trim();
+        this.description = (initData.description || '').trim();
+        this.type = (initData.type || '').trim();
+        this.required = !!initData.required;
+        this.rtexprvalue = !!initData.rtexprvalue;
     }
 }
 
@@ -89,8 +89,8 @@ export class varDesc {
      * @param {string} [initData.type]
      */
     constructor(initData={}) {
-        this.name = initData.name || '';
-        this.description = initData.description || '';
-        this.type = initData.type || '';
+        this.name = (initData.name || '').trim();
+        this.description = (initData.description || '').trim();
+        this.type = (initData.type || '').trim();
     }
 }
