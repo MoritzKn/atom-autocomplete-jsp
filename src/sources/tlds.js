@@ -11,13 +11,15 @@ export function register() {
     let tldPathes = [];
     // TODO: refresh on config change
     atom.config.get('autocomplete-jsp.tldSources').forEach(dir => {
-        dir = dir.replace('~', userHome);
+            dir = dir.replace('~', userHome);
 
-        fs.readdirSync(dir).forEach(fileName => {
-            const path = `${dir.replace(/\/$/, '')}/${fileName}`;
-            tldPathes.push(path);
+            fs.readdirSync(dir)
+                .filter(fileName => fileName.endsWith('.tld'))
+                .forEach(fileName => {
+                    const path = `${dir.replace(/\/$/, '')}/${fileName}`;
+                    tldPathes.push(path);
+                });
         });
-    });
 
     // TODO: when a tld changes, we have to some how reload it..
     Promise.all(tldPathes.map(readInTld))
