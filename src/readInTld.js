@@ -10,17 +10,18 @@ const parseFnSignature = signature => {
     const matches = signature.match(RegExp(
             // return type
             // e.g. java.lang.String
-            '(?:[a-zA-Z][a-zA-Z0-9]*\\.)*([a-zA-Z][a-zA-Z0-9\\[\\]]*)\\s+' +
+            '(?:[a-zA-Z_][a-zA-Z_0-9]*\\.)*([a-zA-Z_][a-zA-Z_0-9\\[\\]]*)\\s+' +
             // function name
             // e.g. toUpperCase
-            '([a-zA-Z][a-zA-Z0-9]*)\\s*' +
+            '([a-zA-Z_][a-zA-Z_0-9]*)\\s*' +
             // arguments
             // e.g. (java.lang.String, java.lang.Boolean)
-            '\\(\\s*([a-zA-Z0-9,. \\[\\]]*)\\s*\\)'
+            '\\(\\s*([a-zA-Z_0-9,. \\[\\]]*)\\s*\\)'
         ));
 
     const argumentTypes = matches[3]
         .split(',')
+        .filter(type => !!type)
         .map(fullType => shortType(fullType));
 
     return {

@@ -53,7 +53,7 @@ const getExpressionInfo = (editor, bufferPosition) => {
 };
 
 export const shortType = longName =>
-    longName.match(/([a-zA-Z][a-zA-Z0-9\[\]]*)\s*$/)[1];
+    longName.match(/([a-zA-Z_][a-zA-Z_0-9\[\]]*)\s*$/)[1];
 
 export const mergeCompletions = (sources) => {
     return options => {
