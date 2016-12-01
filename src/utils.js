@@ -20,39 +20,6 @@ export const abbreviate = fullName =>
     fullName.match(/^.|[A-Z]/g).join('').toLowerCase();
 
 
-export const getCompletionPrefix = preCourser => {
-    const match = preCourser.match(/([a-zA-Z][a-zA-Z0-9_:]*)$/);
-    if (!match) {
-        return null;
-    } else {
-        const prefix = match[0];
-        if (prefix) {
-            return prefix;
-        }
-    }
-};
-
-export const getExpressionInfo = (editor, bufferPosition) => {
-    const cutOfExpressionMarks = exp => exp
-        .replace(/^\$\{/, '')
-        .replace(/\}$/, '');
-
-    const scope = '.el_expression';
-    const tb = editor.tokenizedBuffer;
-    const range = tb.bufferRangeForScopeAtPosition(scope, bufferPosition);
-    const expression = cutOfExpressionMarks(editor.getTextInRange(range));
-    const preCourser = cutOfExpressionMarks(editor.getTextInBufferRange({
-            start: range.start,
-            end: bufferPosition,
-        }));
-
-    return {
-        courserPos: preCourser.length,
-        preCourser,
-        expression,
-    };
-};
-
 export const shortType = longName =>
     longName.match(/([a-zA-Z_][a-zA-Z_0-9\[\]]*)\s*$/)[1];
 

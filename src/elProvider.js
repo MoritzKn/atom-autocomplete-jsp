@@ -1,6 +1,6 @@
 'use babel';
 
-import {getCompletionPrefix, getExpressionInfo, oneTrue} from './utils';
+import {oneTrue} from './utils';
 import {getAll as getRegistryElements} from './registry';
 import {TagFunctionDesc, VarDesc, KeywordDesc} from './dataClasses';
 import match from 'match-like';
@@ -8,6 +8,39 @@ import match from 'match-like';
 const Context = {
     PROPERTY: 1,
     NONE: 2,
+};
+
+const getCompletionPrefix = preCourser => {
+    const match = preCourser.match(/([a-zA-Z][a-zA-Z0-9_:]*)$/);
+    if (!match) {
+        return null;
+    } else {
+        const prefix = match[0];
+        if (prefix) {
+            return prefix;
+        }
+    }
+};
+
+const getExpressionInfo = (editor, bufferPosition) => {
+    const cutOfExpressionMarks = exp => exp
+        .replace(/^\$\{/, '')
+        .replace(/\}$/, '');
+
+    const scope = '.el_expression';
+    const tb = editor.tokenizedBuffer;
+    const range = tb.bufferRangeForScopeAtPosition(scope, bufferPosition);
+    const expression = cutOfExpressionMarks(editor.getTextInRange(range));
+    const preCourser = cutOfExpressionMarks(editor.getTextInBufferRange({
+            start: range.start,
+            end: bufferPosition,
+        }));
+
+    return {
+        courserPos: preCourser.length,
+        preCourser,
+        expression,
+    };
 };
 
 export default {
