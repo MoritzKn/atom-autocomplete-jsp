@@ -20,12 +20,8 @@ export const abbreviate = fullName =>
     fullName.match(/^.|[A-Z]/g).join('').toLowerCase();
 
 
-export const getCompletionPrefix = (editor, bufferPosition) => {
-    const {expression, courserPos} = getExpressionInfo(editor, bufferPosition);
-
-    const match = expression.substr(0, courserPos)
-                            .match(/([a-zA-Z][a-zA-Z0-9_:]*)$/);
-
+export const getCompletionPrefix = preCourser => {
+    const match = preCourser.match(/([a-zA-Z][a-zA-Z0-9_:]*)$/);
     if (!match) {
         return null;
     } else {
@@ -36,18 +32,23 @@ export const getCompletionPrefix = (editor, bufferPosition) => {
     }
 };
 
-const getExpressionInfo = (editor, bufferPosition) => {
+export const getExpressionInfo = (editor, bufferPosition) => {
+    const cutOfExpressionMarks = exp => exp
+        .replace(/^\$\{/, '')
+        .replace(/\}$/, '');
+
     const scope = '.el_expression';
     const tb = editor.tokenizedBuffer;
     const range = tb.bufferRangeForScopeAtPosition(scope, bufferPosition);
-    const expression = editor.getTextInRange(range);
-    const preCourser = editor.getTextInBufferRange({
+    const expression = cutOfExpressionMarks(editor.getTextInRange(range));
+    const preCourser = cutOfExpressionMarks(editor.getTextInBufferRange({
             start: range.start,
             end: bufferPosition,
-        });
+        }));
 
     return {
         courserPos: preCourser.length,
+        preCourser,
         expression,
     };
 };
@@ -64,4 +65,20 @@ export const mergeCompletions = (sources) => {
 
         return suggestions;
     };
+};
+
+/**
+ * Test whether a function returns true for any of the supplied values
+ *
+ * @param  {Array}   values
+ * @param  {Funtion} testFn
+ * @return {boolean}
+ */
+export const oneTrue = (values, testFn) => {
+    for (let i = 0; i < values.length; i++) {
+        if (testFn(values[i])) {
+            return true;
+        }
+    }
+    return false;
 };

@@ -11,7 +11,7 @@ export class TaglibDesc {
      * @param {string} [initData.description]
      *
      * @param {TagFunctionDesc[]} [initData.functions]
-     * @param {TagDesc[]}      [initData.tags]
+     * @param {TagDesc[]}         [initData.tags]
      */
     constructor(initData) {
         this.name = (initData.name || '').trim();

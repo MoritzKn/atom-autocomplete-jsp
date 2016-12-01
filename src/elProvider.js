@@ -1,8 +1,14 @@
 'use babel';
 
-import {getCompletionPrefix} from './utils';
+import {getCompletionPrefix, getExpressionInfo, oneTrue} from './utils';
 import {getAll as getRegistryElements} from './registry';
 import {TagFunctionDesc, VarDesc, KeywordDesc} from './dataClasses';
+import match from 'match-like';
+
+const Context = {
+    PROPERTY: 1,
+    NONE: 2,
+};
 
 export default {
     selector: '.text.html.jsp .el_expression',
@@ -13,20 +19,36 @@ export default {
      * @see: https://github.com/atom/language-java/pull/65
      */
     inclusionPriority: 1001,
-    excludeLowerPriority: true, // maybe..?
+    excludeLowerPriority: true,
 
     getSuggestions: options => {
-        const prefix = getCompletionPrefix(options.editor, options.bufferPosition);
+        const {preCourser} = getExpressionInfo(options.editor, options.bufferPosition);
+        const prefix = getCompletionPrefix(preCourser);
+
+        const ctx = [{
+                tester: pre => pre.match(/\.\s*([a-zA-Z][a-zA-Z0-9_:]*)?$/),
+                type: Context.PROPERTY,
+            }, {
+                tester: () => true,
+                type: Context.NONE,
+            }
+        ].filter(type => type.tester(preCourser))[0].type;
 
         if (!prefix) {
             return [];
         }
 
+        const validConstructors = match(ctx, [
+            [Context.PROPERTY, () =>
+                [/* PropertyDesc */]],
+            [Context.NONE, () =>
+                [TagFunctionDesc, VarDesc, KeywordDesc]],
+            [() => []],
+        ]);
+
         return getRegistryElements()
-            .filter(elDesc =>
-                    elDesc instanceof TagFunctionDesc ||
-                    elDesc instanceof VarDesc ||
-                    elDesc instanceof KeywordDesc)
+            .filter(elDesc => oneTrue(validConstructors,
+                cons => elDesc instanceof cons))
             .filter(elDesc => elDesc.filter(prefix))
             .map(elDesc => elDesc.suggestion(prefix));
     },
