@@ -27,13 +27,15 @@ export default {
         const prefixLower = prefix.toLowerCase();
 
         const ctx = [{
-                tester: pre => pre.match(/\.\s*([a-zA-Z][a-zA-Z0-9_:]*)?$/),
-                type: Context.PROPERTY,
-            }, {
-                tester: () => true,
-                type: Context.NONE,
-            }
-        ].filter(type => type.tester(preCourser))[0].type;
+                    tester: pre => pre.match(/\.\s*([a-zA-Z][a-zA-Z0-9_:]*)?$/),
+                    type: Context.PROPERTY,
+                }, {
+                    tester: () => true,
+                    type: Context.NONE,
+                }
+            ]
+            .filter(type => type.tester(preCourser))
+            .map(type => type.type)[0];
 
         if (!prefix) {
             return [];
