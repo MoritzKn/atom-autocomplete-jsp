@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [0.2.1] 2016-12-01
+### Changed
+- TLD files are now loaded completely async
+
+### Fixed
+- Problems with mixed case EL functions
+- Bug when loading TLDs from a folder that contained other files as well
+- Bug with underscores in package or class names
 
 ## [0.2.0] 2016-10-09
 ### Added
