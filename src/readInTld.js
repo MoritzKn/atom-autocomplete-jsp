@@ -86,7 +86,7 @@ const taglibToDesc = taglib => {
         });
     });
 
-    let desc = new TaglibDesc({
+    return new TaglibDesc({
         description,
         name,
         shortName,
@@ -94,13 +94,10 @@ const taglibToDesc = taglib => {
         functions,
         tags,
     });
-
-    return desc;
 };
 
 export default path => {
     return new Promise((resolve, reject) => {
-
         fs.readFile(path, {encoding: 'utf8'}, (err, content) => {
             if (err) {
                 return reject({
