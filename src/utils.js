@@ -27,7 +27,7 @@ export const getCompletionPrefix = preCourser => {
     } else {
         const prefix = match[0];
         if (prefix) {
-            return prefix.toLowerCase();
+            return prefix;
         }
     }
 };

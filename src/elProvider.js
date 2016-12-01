@@ -24,6 +24,7 @@ export default {
     getSuggestions: options => {
         const {preCourser} = getExpressionInfo(options.editor, options.bufferPosition);
         const prefix = getCompletionPrefix(preCourser);
+        const prefixLower = prefix.toLowerCase();
 
         const ctx = [{
                 tester: pre => pre.match(/\.\s*([a-zA-Z][a-zA-Z0-9_:]*)?$/),
@@ -49,7 +50,7 @@ export default {
         return getRegistryElements()
             .filter(elDesc => oneTrue(validConstructors,
                 cons => elDesc instanceof cons))
-            .filter(elDesc => elDesc.filter(prefix))
+            .filter(elDesc => elDesc.filter(prefixLower))
             .map(elDesc => elDesc.suggestion(prefix));
     },
 };
