@@ -60,12 +60,12 @@ export class TagFunctionDesc {
 
     filter(prefix) {
         if (this.namespace.startsWith(prefix) || prefix.startsWith(this.namespace)) {
-            const test1 = `${this.namespace}:${this.name}`;
-            const test2 = `${this.namespace}:${this.abbreviatedName}`;
+            const test1 = `${this.namespace}:${this.name}`.toLowerCase();
+            const test2 = `${this.namespace}:${this.abbreviatedName}`.toLowerCase();
             return test1.startsWith(prefix) || test2.startsWith(prefix);
         } else {
-            const test1 = `${this.name}`;
-            const test2 = `${this.abbreviatedName}`;
+            const test1 = `${this.name}`.toLowerCase();
+            const test2 = `${this.abbreviatedName}`.toLowerCase();
             return test1.startsWith(prefix) || test2.startsWith(prefix);
         }
     }
