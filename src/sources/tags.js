@@ -4,8 +4,8 @@ import * as registry from '../registry';
 import {VarDesc} from '../dataClasses';
 import {shortType} from '../utils';
 
-const varRegExp = /<[a-zA-Z]+:[a-zA-Z]+\s+[^>]*var="([^"]*)"[^>]*>/g;
-const useBeanRegExp = /<\w+:useBean\s+((?:class|id)="[^"]*")\s+((?:class|id)="[^"]*"\s*)\/?\>/g;
+const varRegExp = /<[a-zA-Z][a-zA-Z0-3_]+:[a-zA-Z][a-zA-Z0-3_]+\s+[^>]*var="([^"]*)"[^>]*>/g;
+const useBeanRegExp = /<[a-zA-Z][a-zA-Z0-3_]+:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:class|id)="[^"]*"\s*)[^>]*\/?\>/g;
 
 const liveTime = 800;
 
