@@ -72,13 +72,23 @@ export function add(options) {
     registry.set(id, entry);
 }
 
-export function getAll() {
-    refresh();
+export function getAll({type, name}={}, doRefresh=true) {
+    if (doRefresh) {
+        refresh();
+    }
 
     let all = [];
 
     registry.forEach(entry => {
         const element = entry.get();
+
+        if (type && !(element instanceof type)) {
+            return;
+        }
+
+        if (name && element.name !== name) {
+            return;
+        }
 
         if (element) {
             all.push(element);
