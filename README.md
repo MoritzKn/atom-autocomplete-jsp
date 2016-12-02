@@ -5,7 +5,7 @@ This [Atom](https://atom.io) package adds autocompletion support for JSP and JSP
 **Warning:**
 This package is in a very early stage.
 
-![Screenshot of Atom with autocomplete-jsp](./doc/img/screenshot-minimal.png)
+![Screenshot of Atom with autocomplete-jsp][screenshot]
 
 ## Features
 - EL autocompletion for implicit objects
@@ -21,3 +21,6 @@ This package is in a very early stage.
 
 ## Config
 - `tldSources`: array of directories containing tld files
+
+
+[screenshot]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-minimal.png
