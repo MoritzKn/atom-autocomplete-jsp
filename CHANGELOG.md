@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.1] 2016-13-8
+### Fixed
+- Bug with the recognition of varibles defined in tags
+
 ## [0.3.0] 2016-12-02
 ### Added
 - Autocompletion for references to objects imported by `<jsp:useBean>` tags
