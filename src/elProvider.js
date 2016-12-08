@@ -63,13 +63,12 @@ export default {
         }
 
         const ctx = [{
-                    tester: pre => pre.match(/\.\s*([a-zA-Z][a-zA-Z0-9_:]*)?$/),
-                    type: Context.PROPERTY,
-                }, {
-                    tester: () => true,
-                    type: Context.NONE,
-                }
-            ]
+                tester: pre => pre.match(/\.\s*([a-zA-Z][a-zA-Z0-9_:]*)?$/),
+                type: Context.PROPERTY,
+            }, {
+                tester: () => true,
+                type: Context.NONE,
+            }]
             .filter(type => type.tester(preCourser))
             .map(type => type.type)[0];
 
