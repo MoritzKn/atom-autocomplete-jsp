@@ -11,11 +11,11 @@ const Context = {
 };
 
 const getCompletionPrefix = preCourser => {
-    const match = preCourser.match(/([a-zA-Z][a-zA-Z0-9_:]*)$/);
-    if (!match) {
+    const result = preCourser.match(/([a-zA-Z][a-zA-Z0-9_:]*)$/);
+    if (!result) {
         return null;
     } else {
-        const prefix = match[0];
+        const prefix = result[0];
         if (prefix) {
             return prefix;
         }
