@@ -7,7 +7,7 @@ import {TaglibDesc, TagFunctionDesc, TagDesc, TagAttrDesc} from './dataClasses';
 import {shortType} from './utils.js';
 
 const parseFnSignature = signature => {
-    const matches = signature.match(RegExp(
+    const matches = signature.match(new RegExp(
             // return type
             // e.g. java.lang.String
             '(?:[a-zA-Z_][a-zA-Z_0-9]*\\.)*([a-zA-Z_][a-zA-Z_0-9\\[\\]]*)\\s+' +

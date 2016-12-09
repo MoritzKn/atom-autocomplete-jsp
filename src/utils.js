@@ -35,14 +35,14 @@ export const mergeCompletions = (sources) => {
 };
 
 /**
- * Test whether a function returns true for any of the supplied values
+ * Test whether a given function returns true for any of the supplied values
  *
  * @param  {Array}   values
  * @param  {Funtion} testFn
  * @return {boolean}
  */
 export const oneTrue = (values, testFn) => {
-    for (let i = 0; i < values.length; i++) {
+    for (let i = 0; i < values.length; i += 1) {
         if (testFn(values[i])) {
             return true;
         }
