@@ -1,38 +1,20 @@
 'use babel';
 
-import fs from 'fs';
+import fs from 'fs-plus';
 import readInTld from '../readInTld';
 import {add as addToRegistry} from '../registry';
 
-
 export function register() {
-    const userHome = process.env[process.platform === 'win32' ? 'USERPROFILE' : 'HOME'];
-    const tldSources = atom.config.get('autocomplete-jsp.tldSources');
-
     // TODO: refresh on config change
-    Promise.all(tldSources
-            .map(path => path = path.replace('~', userHome))
-            .map(path => new Promise((resolve, reject) =>
-                fs.readdir(path, (err, fileNames) => {
-                    if (err) {
-                        return reject(err);
-                    }
+    const tldSourceDirs = atom.config.get('autocomplete-jsp.tldSources')
+            .map(path => fs.normalize(path));
 
-
-                    resolve(fileNames
-                        .filter(name => name.endsWith('.tld'))
-                        .map(name => `${path.replace(/\/$/, '')}/${name}`)
-                    );
-                })
-            ))
-        )
-        // TODO: reload on change
-        .then(result => Promise.all(result
-                .reduce((all, next) => all.concat(next), [])
-                .map(readInTld)
-            )
-        )
+    Promise.all(tldSourceDirs.map(readdirProm))
+        .then(result => [].concat.apply([], result))
+        .then(paths => paths.filter(path => path.endsWith('.tld')))
+        .then(paths => Promise.all(paths.map(readInTld)))
         .then(tldDescs => tldDescs
+            // TODO: reload on file change
             .forEach(tldDesc => {
                 tldDesc.functions.forEach(fnDesc =>
                     addToRegistry({
@@ -50,9 +32,25 @@ export function register() {
             })
         )
         .catch(err =>
-            atom.notifications.addWarning(err.msg, {
+            atom.notifications.addWarning(`Autocomplete-JSP: ${err.msg}`, {
                 dismissable: true,
                 detail: `Caused by:\n${err.causedBy}`,
             })
         );
+}
+
+function readdirProm(path) {
+    path = path.replace(/[/\\]$/, '');
+    return new Promise((resolve, reject) =>
+        fs.readdir(path, (err, fileNames) => {
+            if (err) {
+                return reject({
+                    msg: `Reading directory '${path}' failed`,
+                    causedBy: err,
+                });
+            }
+
+            resolve(fileNames.map(name => `${path}/${name}`));
+        })
+    );
 }
