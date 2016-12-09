@@ -6,7 +6,7 @@ export default {
     inclusionPriority: 50,
     excludeLowerPriority: false, // include html tags etc
 
-    getSuggestions: ({editor, bufferPosition}) => {
+    getSuggestions: () => {
         return [];
     }
 };
