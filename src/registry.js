@@ -3,7 +3,7 @@
 let registry = new Map();
 let refreshHandlers = [];
 
-export class RegistryEntry {
+class RegistryEntry {
     constructor(options) {
         this.element = options.element;
 
