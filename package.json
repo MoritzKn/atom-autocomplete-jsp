@@ -23,7 +23,7 @@
     "pages"
   ],
   "scripts": {
-    "test": "./node_modules/jshint/bin/jshint src/*.js src/**/*.js"
+    "test": "./node_modules/jshint/bin/jshint src/**.js"
   },
   "engines": {
     "atom": ">=1.0.0"
