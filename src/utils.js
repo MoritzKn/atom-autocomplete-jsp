@@ -1,7 +1,7 @@
 'use babel';
 
 /**
- * Check if a name should be suggested
+ * Check if something should be suggested
  *
  * @param  {string} name   - name of the function, varible, etc
  * @param  {string} prefix - completion prefix, should be lower case
