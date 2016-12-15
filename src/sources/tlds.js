@@ -4,6 +4,22 @@ import fs from 'fs-plus';
 import readInTld from '../readInTld';
 import {add as addToRegistry} from '../registry';
 
+function readdirProm(path) {
+    path = path.replace(/[/\\]$/, '');
+    return new Promise((resolve, reject) =>
+        fs.readdir(path, (err, fileNames) => {
+            if (err) {
+                return reject({
+                    msg: `Reading directory '${path}' failed`,
+                    causedBy: err,
+                });
+            }
+
+            resolve(fileNames.map(name => `${path}/${name}`));
+        })
+    );
+}
+
 export function register() {
     // TODO: refresh on config change
     const tldSourceDirs = atom.config.get('autocomplete-jsp.tldSources')
@@ -37,20 +53,4 @@ export function register() {
                 detail: `Caused by:\n${err.causedBy}`,
             })
         );
-}
-
-function readdirProm(path) {
-    path = path.replace(/[/\\]$/, '');
-    return new Promise((resolve, reject) =>
-        fs.readdir(path, (err, fileNames) => {
-            if (err) {
-                return reject({
-                    msg: `Reading directory '${path}' failed`,
-                    causedBy: err,
-                });
-            }
-
-            resolve(fileNames.map(name => `${path}/${name}`));
-        })
-    );
 }

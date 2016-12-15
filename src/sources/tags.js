@@ -5,7 +5,7 @@ import {VarDesc} from '../dataClasses';
 import {shortType} from '../utils';
 
 const varRegExp = /<[a-zA-Z][a-zA-Z0-3_]*:[a-zA-Z][a-zA-Z0-3_]+\s+[^>]*var="([^"]*)"[^>]*>/g;
-const useBeanRegExp = /<jsp:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:class|id)="[^"]*"\s*)[^>]*\/?\>/g;
+const useBeanRegExp = /<jsp:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:class|id)="[^"]*"\s*)[^>]*\/?>/g;
 
 const liveTime = 800;
 
