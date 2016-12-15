@@ -1,39 +1,47 @@
 'use babel';
 
 import {add as addToRegistry} from '../registry';
-import {KeywordDesc} from '../dataClasses';
+import {KeywordDesc} from '../descClasses';
 
 const keywords = [
     new KeywordDesc({
         keyword: 'div',
-        description: 'Division.',
+        fullName: 'Division',
+        description: 'Divides left-hand operand by right-hand operand.',
     }),
     new KeywordDesc({
         keyword: 'mod',
-        description: 'Modulo (remainder)',
+        fullName: 'Modulus (Remainder)',
+        description: 'Divides left-hand and right-hand operand and returns remainder.',
     }),
     new KeywordDesc({
         keyword: 'eq',
+        fullName: 'equal',
         description: 'Test for equality.',
     }),
     new KeywordDesc({
         keyword: 'ne',
+        fullName: 'not equal',
         description: 'Test for inequality.',
     }),
     new KeywordDesc({
         keyword: 'lt',
+        fullName: 'less than',
         description: 'Test for less than.',
     }),
     new KeywordDesc({
         keyword: 'gt',
+        fullName: 'greater than',
         description: 'Test for greater than.',
     }),
     new KeywordDesc({
         keyword: 'le',
+        fullName: 'less or equal',
         description: 'Test for less or equal.',
     }),
     new KeywordDesc({
         keyword: 'ge',
+        fullName: 'greater or equal',
         description: 'Test for greater or equal.',
     }),
     new KeywordDesc({
@@ -46,7 +54,7 @@ const keywords = [
     }),
     new KeywordDesc({
         keyword: 'not',
-        description: 'Negation',
+        description: 'Logically negates right-hand operand.',
     }),
     new KeywordDesc({
         keyword: 'empty',
@@ -55,10 +63,5 @@ const keywords = [
 ];
 
 export function register() {
-    keywords.forEach(el => {
-        addToRegistry({
-            element: el,
-            liveTime: Infinity,
-        });
-    });
+    keywords.forEach(element => addToRegistry({element}));
 }

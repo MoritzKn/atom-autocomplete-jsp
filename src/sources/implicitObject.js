@@ -1,7 +1,7 @@
 'use babel';
 
 import {add as addToRegistry} from '../registry';
-import {VarDesc} from '../dataClasses';
+import {VarDesc} from '../descClasses';
 
 const implicitObjects = [
     new VarDesc({
@@ -62,10 +62,5 @@ const implicitObjects = [
 ];
 
 export function register() {
-    implicitObjects.forEach(el => {
-        addToRegistry({
-            element: el,
-            liveTime: Infinity,
-        });
-    });
+    implicitObjects.forEach(element => addToRegistry({element}));
 }

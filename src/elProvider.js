@@ -1,47 +1,85 @@
 'use babel';
 
-import {oneTrue} from './utils';
-import {getAll as getRegistryElements} from './registry';
-import {TagFunctionDesc, VarDesc, KeywordDesc} from './dataClasses';
 import match from 'match-like';
 
+import {oneTrue} from './utils';
+import {getAll as getRegistryElements} from './registry';
+import {TagFunctionDesc, VarDesc, KeywordDesc} from './descClasses';
+
+/**
+ * Context of the completion
+ * @enum {Number}
+ */
 const Context = {
     PROPERTY: 1,
     NONE: 2,
 };
 
-const getCompletionPrefix = preCourser => {
+/**
+ * Correlation between `Context` types and test functions
+ * @type {Array}
+ */
+const contextTests = [{
+    tester: pre => pre.match(/\.\s*([a-zA-Z][a-zA-Z0-9_:]*)?$/),
+    type: Context.PROPERTY,
+}, {
+    tester: () => true,
+    type: Context.NONE,
+}];
+
+/**
+ * detects the context of the completion
+ * @param  {String} preCourser
+ * @returns Context
+ */
+function getcompletionContext(preCourser) {
+    return contextTests.filter(type => type.tester(preCourser))
+                       .map(type => type.type)[0];
+}
+
+/**
+ * Gets the valid desc classes for a given completion context
+ * @param   {Context} context the completion context
+ * @returns Function          constructor of a desc class
+ */
+function getTypesForContext(context) {
+    return match(context, [
+        [Context.PROPERTY, () => [/* TODO: PropertyDesc */]],
+        [Context.NONE,     () => [TagFunctionDesc, VarDesc, KeywordDesc]],
+        [                  () => []],
+    ]);
+}
+
+function getCompletionPrefix(preCourser) {
     const result = preCourser.match(/([a-zA-Z][a-zA-Z0-9_:]*)$/);
     if (!result) {
         return null;
-    } else {
-        const prefix = result[0];
-        if (prefix) {
-            return prefix;
-        }
     }
-};
+    return result[0] || null;
+}
 
-const getExpressionInfo = (editor, bufferPosition) => {
-    const cutOfExpressionMarks = exp => exp
-        .replace(/^\$\{/, '')
-        .replace(/\}$/, '');
+function cutOfExpressionMarks(exp) {
+    return exp.replace(/^\$\{/, '')
+              .replace(/\}$/, '');
+}
 
+function getExpressionInfo(editor, bufferPosition) {
     const scope = '.el_expression';
     const tb = editor.tokenizedBuffer;
     const range = tb.bufferRangeForScopeAtPosition(scope, bufferPosition);
     const expression = cutOfExpressionMarks(editor.getTextInRange(range));
-    const preCourser = cutOfExpressionMarks(editor.getTextInBufferRange({
-            start: range.start,
-            end: bufferPosition,
-        }));
+    const preCourserRange = {
+        start: range.start,
+        end: bufferPosition,
+    };
+    const preCourser = cutOfExpressionMarks(editor.getTextInBufferRange(preCourserRange));
 
     return {
         courserPos: preCourser.length,
         preCourser,
         expression,
     };
-};
+}
 
 export default {
     selector: '.text.html.jsp .el_expression',
@@ -54,37 +92,27 @@ export default {
     inclusionPriority: 1001,
     excludeLowerPriority: true,
 
-    getSuggestions: options => {
-        const {preCourser} = getExpressionInfo(options.editor, options.bufferPosition);
+    getSuggestions: ({editor, bufferPosition, activatedManually}) => {
+        const {preCourser} = getExpressionInfo(editor, bufferPosition);
         const prefix = getCompletionPrefix(preCourser);
 
         if (!prefix) {
             return [];
         }
 
-        const ctx = [{
-                tester: pre => pre.match(/\.\s*([a-zA-Z][a-zA-Z0-9_:]*)?$/),
-                type: Context.PROPERTY,
-            }, {
-                tester: () => true,
-                type: Context.NONE,
-            }]
-            .filter(type => type.tester(preCourser))
-            .map(type => type.type)[0];
+        if (!activatedManually) {
+            const minLen = atom.config.get('autocomplete-plus.minimumWordLength');
+            if (prefix.length <= minLen) {
+                return [];
+            }
+        }
 
+        const context = getcompletionContext(preCourser);
         const prefixLower = prefix.toLowerCase();
-
-        const validConstructors = match(ctx, [
-            [Context.PROPERTY, () =>
-                [/* PropertyDesc */]],
-            [Context.NONE, () =>
-                [TagFunctionDesc, VarDesc, KeywordDesc]],
-            [() => []],
-        ]);
+        const validTypes = getTypesForContext(context);
 
         return getRegistryElements()
-            .filter(elDesc => oneTrue(validConstructors,
-                cons => elDesc instanceof cons))
+            .filter(elDesc => oneTrue(validTypes, cons => elDesc instanceof cons))
             .filter(elDesc => elDesc.filter(prefixLower))
             .map(elDesc => elDesc.suggestion(prefix));
     },

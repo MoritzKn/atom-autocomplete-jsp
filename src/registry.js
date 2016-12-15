@@ -4,17 +4,13 @@ let registry = new Map();
 let refreshHandlers = [];
 
 class RegistryEntry {
-    constructor(options) {
-        this.element = options.element;
 
-        if (typeof options.liveTime !== 'undefined') {
-            this.liveTime = options.liveTime;
-        } else {
-            this.liveTime = 600;
-        }
+    constructor({element, refresh, liveTime=Infinity}) {
+        this.element = element;
+        this.liveTime = liveTime;
 
-        this.refresh = options.refresh;
-        this.refreshable = isFinite(this.liveTime);
+        this.refresh = refresh;
+        this.refreshable = isFinite(liveTime);
 
         this.lastChanged = new Date();
 
@@ -24,8 +20,11 @@ class RegistryEntry {
 
     get() {
         const now = new Date();
-        if (this.refreshable && this.lastChanged.getTime() + this.liveTime < now.getTime()) {
-            this.set(this.refresh());
+        if (this.refreshable) {
+            const nextChange = this.lastChanged.getTime() + this.liveTime;
+            if (nextChange < now.getTime()) {
+                this.set(this.refresh());
+            }
         }
         return this.element;
     }
@@ -37,14 +36,14 @@ class RegistryEntry {
 
     remove() {
         if (this.id === null) {
-            throw new Error(`This entry is not part of the registry`);
+            throw new Error('This entry is not part of the registry');
         }
 
         const wasInRegistry = registry.delete(this.id);
         if (wasInRegistry) {
             this.id = null;
         } else {
-            throw new Error(`This entry is not part of the registry`);
+            throw new Error('This entry is not part of the registry');
         }
     }
 }

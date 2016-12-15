@@ -1,8 +1,7 @@
 'use babel';
 
 import * as registry from '../registry';
-import {VarDesc} from '../dataClasses';
-import {shortType} from '../utils';
+import {VarDesc} from '../descClasses';
 
 const varRegExp = /<[a-zA-Z][a-zA-Z0-3_]*:[a-zA-Z][a-zA-Z0-3_]+\s+[^>]*var="([^"]*)"[^>]*>/g;
 const useBeanRegExp = /<jsp:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:class|id)="[^"]*"\s*)[^>]*\/?>/g;
@@ -16,6 +15,7 @@ export function register() {
     registry.on('refresh', () => {
 
         const now = new Date();
+
         if (lastChanged.getTime() + liveTime > now.getTime()) {
             return;
         }
@@ -23,7 +23,7 @@ export function register() {
         let localVersion = version;
         const editorText = atom.workspace.getActiveTextEditor().getText();
 
-        const refreshFn = function() {
+        const refreshHandler = function() {
             if (version > localVersion) {
                 this.remove();
             } else {
@@ -32,16 +32,16 @@ export function register() {
         };
 
         // Use replace because it's the only way to get all matches and all groups
-        editorText.replace(varRegExp, (match, varName) => {
-            const otherRefs = registry.getAll({ type: VarDesc, name: varName }, false);
+        editorText.replace(varRegExp, (match, name) => {
+            const otherRefs = registry.getAll({ type: VarDesc, name }, false);
 
             if (otherRefs.length > 0) {
                 return;
             }
 
             registry.add({
-                element: new VarDesc({ name: varName }),
-                refresh: refreshFn,
+                element: new VarDesc({ name }),
+                refresh: refreshHandler,
             });
         });
 
@@ -69,10 +69,10 @@ export function register() {
 
             registry.add({
                 element: new VarDesc({
-                    type: shortType(classValue),
+                    type: classValue,
                     name: idValue
                 }),
-                refresh: refreshFn,
+                refresh: refreshHandler,
             });
         });
 
