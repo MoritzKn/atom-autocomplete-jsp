@@ -58,7 +58,7 @@ function getCompletionPrefix(preCourser) {
     return result[0] || null;
 }
 
-function cutOfExpressionMarks(exp) {
+function cutOffExpressionMarks(exp) {
     return exp.replace(/^\$\{/, '')
               .replace(/\}$/, '');
 }
@@ -67,12 +67,12 @@ function getExpressionInfo(editor, bufferPosition) {
     const scope = '.el_expression';
     const tb = editor.tokenizedBuffer;
     const range = tb.bufferRangeForScopeAtPosition(scope, bufferPosition);
-    const expression = cutOfExpressionMarks(editor.getTextInRange(range));
+    const expression = cutOffExpressionMarks(editor.getTextInRange(range));
     const preCourserRange = {
         start: range.start,
         end: bufferPosition,
     };
-    const preCourser = cutOfExpressionMarks(editor.getTextInBufferRange(preCourserRange));
+    const preCourser = cutOffExpressionMarks(editor.getTextInBufferRange(preCourserRange));
 
     return {
         courserPos: preCourser.length,
