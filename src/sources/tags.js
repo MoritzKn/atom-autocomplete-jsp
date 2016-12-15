@@ -6,17 +6,21 @@ import {VarDesc} from '../descClasses';
 const varRegExp = /<[a-zA-Z][a-zA-Z0-3_]*:[a-zA-Z][a-zA-Z0-3_]+\s+[^>]*var="([^"]*)"[^>]*>/g;
 const useBeanRegExp = /<jsp:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:class|id)="[^"]*"\s*)[^>]*\/?>/g;
 
+/**
+ * The live time of the detected elements i.e. the refresh rate
+ * @type {Number}
+ */
 const liveTime = 800;
 
 let version = 0;
-let lastChanged = new Date();
+let lastChanged = Date.now();
 
 export function register() {
     registry.on('refresh', () => {
 
-        const now = new Date();
+        const now = Date.now();
 
-        if (lastChanged.getTime() + liveTime > now.getTime()) {
+        if (lastChanged + liveTime > now) {
             return;
         }
 
