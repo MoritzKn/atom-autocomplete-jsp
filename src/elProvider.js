@@ -58,6 +58,11 @@ function getCompletionPrefix(preCourser) {
     return result[0] || null;
 }
 
+/**
+ * Cuts off the `${` at the start and `}` at the end of an EL expression
+ * @param   {String} exp
+ * @returns String
+ */
 function cutOffExpressionMarks(exp) {
     return exp.replace(/^\$\{/, '')
               .replace(/\}$/, '');
