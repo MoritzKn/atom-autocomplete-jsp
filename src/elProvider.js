@@ -107,7 +107,7 @@ export default {
 
         if (!activatedManually) {
             const minLen = atom.config.get('autocomplete-plus.minimumWordLength');
-            if (prefix.length <= minLen) {
+            if (prefix.length < minLen) {
                 return [];
             }
         }
