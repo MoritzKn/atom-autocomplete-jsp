@@ -46,6 +46,7 @@ export function register() {
             registry.add({
                 element: new VarDesc({ name }),
                 refresh: refreshHandler,
+                liveTime,
             });
         });
 
