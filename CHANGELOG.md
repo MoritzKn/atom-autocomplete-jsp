@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+## Changed
+- Only show autocompleteion if the prefix is longer or equal then the
+  `autocomplete-plus.minimumWordLength` configuration or autocompleteion is triggert with
+  `autocomplete-plus:activate` (<kbd>Ctrl-Space</kbd>)
+
+## Added
+- A lable with the fullname for keyword e.g. `less or equal` for `eq`
 
 ## 0.3.2 - 2016-13-8
 No changes
