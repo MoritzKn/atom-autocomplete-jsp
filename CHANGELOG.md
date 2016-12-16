@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## 0.3.3 - 2016-12-16
 ## Changed
 - Only show autocompleteion if the prefix is longer or equal then the
-  `autocomplete-plus.minimumWordLength` configuration or autocompleteion is triggert with
-  `autocomplete-plus:activate` (<kbd>Ctrl-Space</kbd>)
+  `autocomplete-plus.minimumWordLength` configuration or the autocompletion was triggered
+  by `autocomplete-plus:activate` (<kbd>Ctrl-Space</kbd>)
 
 ## Added
-- A lable with the fullname for keyword e.g. `less or equal` for `eq`
+- A label with the full name for keyword e.g. `less or equal` for `eq`
 - Specs for the EL-provider
 
 ## 0.3.2 - 2016-12-8
@@ -21,7 +21,7 @@ No changes
 
 ## 0.3.1 - 2016-12-8
 ### Fixed
-- Bug with the recognition of varibles defined in tags
+- Bug with the recognition of variables defined in tags
 
 ## 0.3.0 - 2016-12-02
 ### Added
@@ -33,7 +33,7 @@ No changes
 
 ## 0.2.1 - 2016-12-01
 ### Changed
-- TLD files are now loaded completely async
+- The TLD files are now loaded completely async
 
 ### Fixed
 - Problems with mixed case EL functions
@@ -42,8 +42,8 @@ No changes
 
 ## 0.2.0 - 2016-10-09
 ### Added
-- Mechanism to load tlds from a directories specified in the config
-- Autocompletion for varibles defined in tags such as `<c:set var"foo" value="bar"/>`
+- Mechanism to load TLFs from a directories specified by the configuration
+- Autocompletion for variables defined in tags such as `<c:set var"foo" value="bar"/>`
 
 ## 0.1.0 - 2016-10-07
 ### Added
