@@ -220,6 +220,7 @@ describe('JSP autocompletions', () => {
         editor.setCursorBufferPosition([1, text.length - 1]);
 
         const completions = getCompletions(true);
+
         const matchingCompletions = completions.filter(comp => {
             const completion = comp.text || comp.snippet;
             return completion.includes('ts:concat');
