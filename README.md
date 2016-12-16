@@ -1,4 +1,6 @@
 # Atom autocomplete+ provider for JSP
+[![Build Status](https://travis-ci.org/MoritzKn/atom-autocomplete-jsp.svg?branch=master)](https://travis-ci.org/MoritzKn/atom-autocomplete-jsp)
+
 
 This [Atom](https://atom.io) package adds autocompletion support for JSP with focus on it's subset JSPX.
 
