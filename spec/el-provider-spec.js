@@ -190,7 +190,6 @@ describe('JSP autocompletions', () => {
         editor.buffer.append('<jsp:useBean id="myMap" class="java.utils.HashMap">\n');
         const text = '${myMa}';
         editor.buffer.append(text);
-
         editor.setCursorBufferPosition([1, text.length - 1]);
 
         setTimeout(function () {
