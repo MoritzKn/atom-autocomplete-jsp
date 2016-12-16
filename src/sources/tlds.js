@@ -132,6 +132,17 @@ function readdirProm(path) {
     );
 }
 
+export function readAndRegisterTlds(paths) {
+    return Promise.all(paths.map(readInTld))
+        .then(tldDescs => tldDescs
+            // TODO: reload on file change
+            .forEach(tldDesc => {
+                tldDesc.functions.forEach(element => addToRegistry({element}));
+                tldDesc.tags.forEach(element => addToRegistry({element}));
+            })
+        );
+}
+
 export function register() {
     // TODO: refresh on config change
     const tldSourceDirs = atom.config.get('autocomplete-jsp.tldSources')
@@ -140,14 +151,7 @@ export function register() {
     Promise.all(tldSourceDirs.map(readdirProm))
         .then(result => [].concat.apply([], result))
         .then(paths => paths.filter(path => path.endsWith('.tld')))
-        .then(paths => Promise.all(paths.map(readInTld)))
-        .then(tldDescs => tldDescs
-            // TODO: reload on file change
-            .forEach(tldDesc => {
-                tldDesc.functions.forEach(element => addToRegistry({element}));
-                tldDesc.tags.forEach(element => addToRegistry({element}));
-            })
-        )
+        .then(paths => readAndRegisterTlds(paths))
         .catch(err =>
             atom.notifications.addWarning(`Autocomplete-JSP: ${err.msg}`, {
                 dismissable: true,

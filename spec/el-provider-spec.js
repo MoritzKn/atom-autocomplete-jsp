@@ -212,27 +212,37 @@ describe('JSP autocompletions', () => {
         }, 1000);
     });
 
-    it('returns completions from `.tld` files', () => {
+    it('returns completions from `.tld` files', (done) => {
         atom.config.set('autocomplete-jsp.tldSources', `${__dirname}/fixtures/tlds/`);
 
         const text = '${ts:}';
         editor.setText(text);
         editor.setCursorBufferPosition([1, text.length - 1]);
 
-        const completions = getCompletions(true);
+        const pgkPath = atom.packages.loadPackage('autocomplete-jsp').path;
+        const testTld = `${pgkPath}/spec/fixtures/tlds/test.tld`;
 
-        const matchingCompletions = completions.filter(comp => {
-            const completion = comp.text || comp.snippet;
-            return completion.includes('ts:concat');
-        });
+        require(`${pgkPath}/src/sources/tlds`).readAndRegisterTlds([testTld])
+            .then(() => {
 
-        const completion = matchingCompletions[0];
-        expect(completion).toBeDefined();
-        if (completion) {
-            expect(completion.description).toBe('Concatenates two strings.');
-            expect(completion.leftLabel).toBe('String');
-            expect(completion.type).toBe('function');
-            expect(completion.replacementPrefix).toBe('ts:');
-        }
+                const completions = getCompletions(true);
+
+                const matchingCompletions = completions.filter(comp => {
+                    const completion = comp.text || comp.snippet;
+                    return completion.includes('ts:concat');
+                });
+
+                const completion = matchingCompletions[0];
+                expect(completion).toBeDefined();
+                if (completion) {
+                    expect(completion.description).toBe('Concatenates two strings.');
+                    expect(completion.leftLabel).toBe('String');
+                    expect(completion.type).toBe('function');
+                    expect(completion.replacementPrefix).toBe('ts:');
+                }
+
+                done();
+
+            }).catch(() => done.fail());
     });
 });
