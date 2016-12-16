@@ -1,7 +1,7 @@
 'use babel';
 
 import {add as addToRegistry} from '../registry';
-import {KeywordDesc} from '../descClasses';
+import {KeywordDesc} from '../desc-classes';
 
 const keywords = [
     new KeywordDesc({

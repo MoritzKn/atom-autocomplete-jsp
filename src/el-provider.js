@@ -4,7 +4,7 @@ import match from 'match-like';
 
 import {oneTrue} from './utils';
 import {getAll as getRegistryElements} from './registry';
-import {TagFunctionDesc, VarDesc, KeywordDesc} from './descClasses';
+import {TagFunctionDesc, VarDesc, KeywordDesc} from './desc-classes';
 
 /**
  * Context of the completion

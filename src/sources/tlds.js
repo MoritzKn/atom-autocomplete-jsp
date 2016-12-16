@@ -2,7 +2,7 @@
 
 import fs from 'fs-plus';
 import xml2js from 'xml2js';
-import {TaglibDesc, TagFunctionDesc, TagDesc, TagAttrDesc} from '../descClasses';
+import {TaglibDesc, TagFunctionDesc, TagDesc, TagAttrDesc} from '../desc-classes';
 import {add as addToRegistry} from '../registry';
 import {getDeepPropSave as gdps} from '../utils';
 

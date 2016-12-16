@@ -1,7 +1,7 @@
 'use babel';
 
 import {add as addToRegistry} from '../registry';
-import {VarDesc} from '../descClasses';
+import {VarDesc} from '../desc-classes';
 
 const implicitObjects = [
     new VarDesc({

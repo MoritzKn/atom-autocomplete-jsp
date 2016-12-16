@@ -1,7 +1,7 @@
 'use babel';
 
 import * as registry from '../registry';
-import {VarDesc} from '../descClasses';
+import {VarDesc} from '../desc-classes';
 
 const varRegExp = /<[a-zA-Z][a-zA-Z0-3_]*:[a-zA-Z][a-zA-Z0-3_]+\s+[^>]*var="([^"]*)"[^>]*>/g;
 const useBeanRegExp = /<jsp:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:class|id)="[^"]*"\s*)[^>]*\/?>/g;
