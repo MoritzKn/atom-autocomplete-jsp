@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd" version="2.0">
+
+    <description>Demo library</description>
+    <display-name>demo</display-name>
+    <tlib-version>1.0</tlib-version>
+    <short-name>de</short-name>
+    <uri>http://example.com/jsp/demo</uri>
+
+    <function>
+        <description>
+            Concatenates two strings.
+        </description>
+        <name>concat</name>
+        <function-class>some.class.path.Functions</function-class>
+        <function-signature>java.lang.String concat(java.lang.String, java.lang.String)</function-signature>
+        <example>
+            &lt;c:if test="${fn:contains(de:concat(firstName, lastName), searchString)}">
+        </example>
+    </function>
+
+    <tag>
+        <description>
+            Some random tag.
+        </description>
+        <name>someTag</name>
+        <tag-class>some.class.path.Tags</tag-class>
+        <body-content>JSP</body-content>
+        <attribute>
+            <description>
+                Does nothing.
+            </description>
+            <name>bar</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+    </tag>
+</taglib>

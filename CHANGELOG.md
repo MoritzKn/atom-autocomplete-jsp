@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Added
 - A lable with the fullname for keyword e.g. `less or equal` for `eq`
+- Specs for the EL-provider
 
 ## 0.3.2 - 2016-13-8
 No changes
