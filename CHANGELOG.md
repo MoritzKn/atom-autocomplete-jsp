@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+
+## 0.3.3 - 2016-12-16
 ## Changed
 - Only show autocompleteion if the prefix is longer or equal then the
   `autocomplete-plus.minimumWordLength` configuration or autocompleteion is triggert with
@@ -14,10 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - A lable with the fullname for keyword e.g. `less or equal` for `eq`
 - Specs for the EL-provider
 
-## 0.3.2 - 2016-13-8
+## 0.3.2 - 2016-12-8
 No changes
 
-## 0.3.1 - 2016-13-8
+## 0.3.1 - 2016-12-8
 ### Fixed
 - Bug with the recognition of varibles defined in tags
 
