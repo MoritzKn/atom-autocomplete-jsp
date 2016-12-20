@@ -30,7 +30,7 @@ const contextTests = [{
 /**
  * detects the context of the completion
  * @param  {String} preCourser
- * @returns Context
+ * @returns {Context}
  */
 function getcompletionContext(preCourser) {
     return contextTests.filter(type => type.tester(preCourser))
@@ -40,7 +40,7 @@ function getcompletionContext(preCourser) {
 /**
  * Gets the valid desc classes for a given completion context
  * @param   {Context} context the completion context
- * @returns Function          constructor of a desc class
+ * @returns {Function}          constructor of a desc class
  */
 function getTypesForContext(context) {
     return match(context, [
@@ -61,7 +61,7 @@ function getCompletionPrefix(preCourser) {
 /**
  * Cuts off the `${` at the start and `}` at the end of an EL expression
  * @param   {String} exp
- * @returns String
+ * @returns {String}
  */
 function cutOffExpressionMarks(exp) {
     return exp.replace(/^\$\{/, '')
