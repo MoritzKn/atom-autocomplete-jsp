@@ -99,26 +99,26 @@ export default {
 
     getSuggestions: ({editor, bufferPosition, activatedManually}) => {
         const {preCourser} = getExpressionInfo(editor, bufferPosition);
-        const prefix = getCompletionPrefix(preCourser);
+        const replacementPrefix = getCompletionPrefix(preCourser);
 
-        if (!prefix) {
+        if (!replacementPrefix) {
             return [];
         }
 
         if (!activatedManually) {
             const minLen = atom.config.get('autocomplete-plus.minimumWordLength');
-            if (prefix.length < minLen) {
+            if (replacementPrefix.length < minLen) {
                 return [];
             }
         }
 
         const context = getcompletionContext(preCourser);
-        const prefixLower = prefix.toLowerCase();
+        const prefix = replacementPrefix.toLowerCase();
         const validTypes = getTypesForContext(context);
 
         return getRegistryElements()
             .filter(elDesc => oneTrue(validTypes, cons => elDesc instanceof cons))
-            .filter(elDesc => elDesc.filter(prefixLower))
-            .map(elDesc => elDesc.suggestion(prefix));
+            .filter(elDesc => elDesc.filter(prefix))
+            .map(elDesc => elDesc.suggestion({replacementPrefix}));
     },
 };

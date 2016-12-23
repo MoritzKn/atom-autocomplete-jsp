@@ -54,7 +54,7 @@ export class TaglibDesc {
         return check(this.shortName, prefix);
     }
 
-    suggestion(replacementPrefix) {
+    suggestion({replacementPrefix}) {
         return {
             snippet: `${this.shortName}:$0`,
             description: this.description,
@@ -68,17 +68,18 @@ export class TagFunctionDesc {
     /**
      * @param {object}   initData
      * @param {string}   initData.name
+     * @param {TaglibDesc} initData.taglib
      * @param {string}   [initData.class] - package and class the function belongs to
      * @param {string}   [initData.signature]
      * @param {string}   [initData.example]
      * @param {string}   [initData.description]
      * @param {string}   [initData.returnType]
      * @param {string[]} [initData.argumentTypes]
-     * @param {string}   [initData.namespace]
      */
     constructor(initData) {
         this.name = initData.name.trim();
         this.abbreviatedName = abbreviate(this.name);
+        this.taglib = initData.taglib;
         this.class = (initData.class || '').trim();
         this.signature = (initData.signature || '').trim();
         this.example = (initData.example || '').trim();
@@ -86,12 +87,11 @@ export class TagFunctionDesc {
         this.returnType = (initData.returnType || '').trim();
         this.shortReturnType = this.returnType ? toShortType(this.returnType) : '';
         this.argumentTypes = initData.argumentTypes || [];
-        this.namespace = (initData.namespace || '').trim();
         this.snippet = this.getSnippet();
     }
 
     getSnippet() {
-       const ns = this.namespace;
+       const ns = this.taglib.shortName;
        const name = this.name;
        const args = this.argumentTypes;
        const argsStr = args
@@ -102,9 +102,10 @@ export class TagFunctionDesc {
    }
 
     filter(prefix) {
-        if (this.namespace.startsWith(prefix) || prefix.startsWith(this.namespace)) {
-            const test1 = `${this.namespace}:${this.name}`.toLowerCase();
-            const test2 = `${this.namespace}:${this.abbreviatedName}`.toLowerCase();
+        const ns = this.taglib.shortName;
+        if (ns.startsWith(prefix) || prefix.startsWith(ns)) {
+            const test1 = `${ns}:${this.name}`.toLowerCase();
+            const test2 = `${ns}:${this.abbreviatedName}`.toLowerCase();
             return test1.startsWith(prefix) || test2.startsWith(prefix);
         } else {
             const test1 = `${this.name}`.toLowerCase();
@@ -113,7 +114,7 @@ export class TagFunctionDesc {
         }
     }
 
-    suggestion(replacementPrefix) {
+    suggestion({replacementPrefix}) {
         return {
             snippet: this.snippet,
             leftLabel: this.shortReturnType,
@@ -128,6 +129,7 @@ export class TagDesc {
     /**
      * @param {object} initData
      * @param {string} initData.name
+     * @param {TaglibDesc} initData.taglib
      * @param {string} [initData.class]
      * @param {string} [initData.description]
      * @param {string} [initData.content]
@@ -136,6 +138,7 @@ export class TagDesc {
     constructor(initData) {
         this.name = initData.name.trim();
         this.abbreviatedName = abbreviate(this.name);
+        this.taglib = initData.taglib;
         this.class = (initData.class || '').trim();
         this.description = (initData.description || '').trim();
         this.content = (initData.content || '').trim();
@@ -147,7 +150,7 @@ export class TagDesc {
                check(this.abbreviatedName, prefix);
     }
 
-    suggestion(replacementPrefix) {
+    suggestion({replacementPrefix}) {
         return {
             text: this.name,
             description: this.description,
@@ -161,6 +164,7 @@ export class TagAttrDesc {
     /**
      * @param {object}  initData
      * @param {string}  initData.name
+     * @param {TagDesc} initData.tag
      * @param {string}  [initData.description]
      * @param {string}  [initData.type]
      * @param {boolean} [initData.required]
@@ -169,6 +173,7 @@ export class TagAttrDesc {
      constructor(initData) {
         this.name = initData.name.trim();
         this.abbreviatedName = abbreviate(this.name);
+        this.tag = initData.tag;
         this.description = (initData.description || '').trim();
         this.type = (initData.type || '').trim();
         this.shortType = this.type ? toShortType(this.type) : '';
@@ -190,7 +195,7 @@ export class TagAttrDesc {
                check(this.abbreviatedName, prefix);
     }
 
-    suggestion(replacementPrefix) {
+    suggestion({replacementPrefix}) {
         return {
             snippet: this.snippet,
             description: this.description,
@@ -220,7 +225,7 @@ export class VarDesc {
                check(this.abbreviatedName, prefix);
     }
 
-    suggestion(replacementPrefix) {
+    suggestion({replacementPrefix}) {
         return {
             text: this.name,
             leftLabel: this.shortType,
@@ -249,7 +254,7 @@ export class KeywordDesc {
         return check(this.keyword, prefix);
     }
 
-    suggestion(replacementPrefix) {
+    suggestion({replacementPrefix}) {
         return {
             snippet: this.snippet,
             rightLabel: this.fullName,

@@ -45,50 +45,60 @@ function taglibToDesc(taglib) {
     const description = gdps(taglib, 'description', 0);
     const uri = gdps(taglib, 'uri', 0);
 
-    const functions = !taglib.function ? [] : taglib.function.map(fnInfo => {
-        const signature = gdps(fnInfo, 'function-signature', 0);
-        const {returnType, argumentTypes} = parseMethodSignature(signature);
-
-        return new TagFunctionDesc({
-            name: gdps(fnInfo, 'name', 0),
-            class: gdps(fnInfo, 'function-class', 0),
-            description: gdps(fnInfo, 'description', 0),
-            example: gdps(fnInfo, 'example', 0),
-            namespace: shortName,
-            signature,
-            returnType,
-            argumentTypes,
-        });
-    });
-
-    const tags = !taglib.tag ? [] : taglib.tag.map(tagInfo => {
-        return new TagDesc({
-            name: gdps(tagInfo, 'name', 0),
-            class: gdps(tagInfo, 'tag-class', 0),
-            description: gdps(tagInfo, 'description', 0),
-            content: gdps(tagInfo, 'body-content', 0),
-            namespace: shortName,
-
-            attributes: !tagInfo.attribute ? [] : tagInfo.attribute.map(attrInfo => {
-                return new TagAttrDesc({
-                    name: gdps(attrInfo, 'name', 0),
-                    description: gdps(attrInfo, 'description', 0),
-                    type: gdps(attrInfo, 'type', 0),
-                    required: parseBool(gdps(attrInfo, 'required', 0)),
-                    rtexprvalue: parseBool(gdps(attrInfo, 'rtexprvalue', 0)),
-                });
-            })
-        });
-    });
-
-    return new TaglibDesc({
+    const taglibDesc = new TaglibDesc({
         description,
         name,
         shortName,
         uri,
-        functions,
-        tags,
     });
+
+    if (taglib.function) {
+        taglibDesc.functions = taglib.function.map(fnInfo => {
+            const signature = gdps(fnInfo, 'function-signature', 0);
+            const {returnType, argumentTypes} = parseMethodSignature(signature);
+
+            return new TagFunctionDesc({
+                name: gdps(fnInfo, 'name', 0),
+                class: gdps(fnInfo, 'function-class', 0),
+                description: gdps(fnInfo, 'description', 0),
+                example: gdps(fnInfo, 'example', 0),
+                namespace: shortName,
+                taglib: taglibDesc,
+                signature,
+                returnType,
+                argumentTypes,
+            });
+        });
+    }
+
+    if (taglib.tag) {
+        taglibDesc.tags = taglib.tag.map(tag => {
+            const tagDesc = new TagDesc({
+                name: gdps(tag, 'name', 0),
+                class: gdps(tag, 'tag-class', 0),
+                description: gdps(tag, 'description', 0),
+                content: gdps(tag, 'body-content', 0),
+                taglib: taglibDesc,
+            });
+
+            if (tag.attribute) {
+                tagDesc.attributes = tag.attribute.map(attr => {
+                    return new TagAttrDesc({
+                        name: gdps(attr, 'name', 0),
+                        description: gdps(attr, 'description', 0),
+                        type: gdps(attr, 'type', 0),
+                        required: parseBool(gdps(attr, 'required', 0)),
+                        rtexprvalue: parseBool(gdps(attr, 'rtexprvalue', 0)),
+                        tag: tagDesc,
+                    });
+                });
+            }
+
+            return tagDesc;
+        });
+    }
+
+    return taglibDesc;
 }
 
 function readInTld(path) {
