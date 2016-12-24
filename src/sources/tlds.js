@@ -49,8 +49,8 @@ function taglibToDesc(taglib) {
 
     const taglibDesc = new TaglibDesc({
         description,
-        name,
-        shortName,
+        name: shortName,
+        fullName: name,
         uri,
     });
 

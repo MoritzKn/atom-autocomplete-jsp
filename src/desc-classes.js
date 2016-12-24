@@ -30,10 +30,29 @@ function check(name, prefix) {
            name.toLowerCase().startsWith(prefix);
 }
 
-export class TaglibDesc {
+class GenericDesc {
+    /**
+     * @param {string} name
+     */
+    constructor(name) {
+        this.name = name.trim();
+        this.abbreviatedName = abbreviate(this.name);
+    }
+
+    filter({prefix}) {
+        return check(this.name, prefix) ||
+               check(this.abbreviatedName, prefix);
+    }
+
+    toString() {
+        return this.name || super.toString();
+    }
+}
+
+export class TaglibDesc extends GenericDesc {
     /**
      * @param {object} initData
-     * @param {string} [initData.name]
+     * @param {string} initData.name
      * @param {string} [initData.shortName]
      * @param {string} [initData.uri]
      * @param {string} [initData.description]
@@ -41,8 +60,8 @@ export class TaglibDesc {
      * @param {TagDesc[]}         [initData.tags]
      */
     constructor(initData) {
-        this.name = (initData.name || '').trim();
-        this.shortName = (initData.shortName || '').trim();
+        super(initData.name);
+        this.fullName = (initData.fullName || '').trim();
         this.uri = (initData.uri || '').trim();
         this.description = (initData.description || '').trim();
 
@@ -50,13 +69,9 @@ export class TaglibDesc {
         this.tags = initData.tags || [];
     }
 
-    filter({prefix}) {
-        return check(this.shortName, prefix);
-    }
-
     suggestion({replacementPrefix}) {
         return {
-            snippet: `${this.shortName}:$0`,
+            snippet: `${this.name}:$0`,
             description: this.description,
             type: 'namespace',
             replacementPrefix,
@@ -64,7 +79,7 @@ export class TaglibDesc {
     }
 }
 
-export class TagFunctionDesc {
+export class TagFunctionDesc extends GenericDesc {
     /**
      * @param {object}   initData
      * @param {string}   initData.name
@@ -77,8 +92,7 @@ export class TagFunctionDesc {
      * @param {string[]} [initData.argumentTypes]
      */
     constructor(initData) {
-        this.name = initData.name.trim();
-        this.abbreviatedName = abbreviate(this.name);
+        super(initData.name);
         this.taglib = initData.taglib;
         this.class = (initData.class || '').trim();
         this.signature = (initData.signature || '').trim();
@@ -149,7 +163,7 @@ export class TagFunctionDesc {
     }
 }
 
-export class TagDesc {
+export class TagDesc extends GenericDesc {
     /**
      * @param {object} initData
      * @param {string} initData.name
@@ -160,18 +174,12 @@ export class TagDesc {
      * @param {TagAttrDesc[]} [initData.attributes]
      */
     constructor(initData) {
-        this.name = initData.name.trim();
-        this.abbreviatedName = abbreviate(this.name);
+        super(initData.name);
         this.taglib = initData.taglib;
         this.class = (initData.class || '').trim();
         this.description = (initData.description || '').trim();
         this.content = (initData.content || '').trim();
         this.attributes = initData.attributes || [];
-    }
-
-    filter({prefix}) {
-        return check(this.name, prefix) ||
-               check(this.abbreviatedName, prefix);
     }
 
     suggestion({replacementPrefix}) {
@@ -182,9 +190,13 @@ export class TagDesc {
             replacementPrefix,
         };
     }
+
+    toString() {
+        return this.name;
+    }
 }
 
-export class TagAttrDesc {
+export class TagAttrDesc extends GenericDesc {
     /**
      * @param {object}  initData
      * @param {string}  initData.name
@@ -195,8 +207,7 @@ export class TagAttrDesc {
      * @param {boolean} [initData.rtexprvalue]
      */
      constructor(initData) {
-        this.name = initData.name.trim();
-        this.abbreviatedName = abbreviate(this.name);
+        super(initData.name);
         this.tag = initData.tag;
         this.description = (initData.description || '').trim();
         this.type = (initData.type || '').trim();
@@ -214,11 +225,6 @@ export class TagAttrDesc {
        }
    }
 
-    filter({prefix}) {
-        return check(this.name, prefix) ||
-               check(this.abbreviatedName, prefix);
-    }
-
     suggestion({replacementPrefix}) {
         return {
             snippet: this.snippet,
@@ -229,7 +235,7 @@ export class TagAttrDesc {
     }
 }
 
-export class VarDesc {
+export class VarDesc extends GenericDesc {
     /**
      * @param {object} initData
      * @param {string} initData.name
@@ -237,16 +243,10 @@ export class VarDesc {
      * @param {string} [initData.type]
      */
     constructor(initData) {
-        this.name = initData.name.trim();
-        this.abbreviatedName = abbreviate(this.name);
+        super(initData.name);
         this.description = (initData.description || '').trim();
         this.type = (initData.type || '').trim();
         this.shortType = this.type ? toShortType(this.type) : '';
-    }
-
-    filter({prefix}) {
-        return check(this.name, prefix) ||
-               check(this.abbreviatedName, prefix);
     }
 
     suggestion({replacementPrefix}) {
@@ -260,7 +260,7 @@ export class VarDesc {
     }
 }
 
-export class KeywordDesc {
+export class KeywordDesc extends GenericDesc {
     /**
      * @param {object} initData
      * @param {string} initData.keyword
@@ -268,14 +268,14 @@ export class KeywordDesc {
      * @param {string} [initData.description]
      */
     constructor(initData) {
-        this.keyword = initData.keyword.trim();
+        super(initData.keyword || initData.name);
         this.fullName = (initData.fullName || '').trim();
         this.description = (initData.description || '').trim();
         this.snippet = this.getSnippet();
     }
 
-    filter({prefix}) {
-        return check(this.keyword, prefix);
+    getSnippet() {
+        return this.name + ' $0';
     }
 
     suggestion({replacementPrefix}) {
@@ -286,9 +286,5 @@ export class KeywordDesc {
             type: 'keyword',
             replacementPrefix,
         };
-    }
-
-    getSnippet() {
-        return this.keyword + ' $0';
     }
 }
