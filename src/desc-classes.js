@@ -17,9 +17,9 @@ function toShortType(longName) {
 /**
  * Check if something should be suggested
  *
- * @param  {string} name   - name of the function, varible, etc
- * @param  {string} prefix - completion prefix, should be lower case
- * @return {boolean}       - add suggestion?
+ * @param   {string} name   - name of the function, varible, etc
+ * @param   {string} prefix - completion prefix, should be lower case
+ * @returns {boolean}       - add suggestion?
  */
 function check(name, prefix) {
     if (!name || !prefix) {

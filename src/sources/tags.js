@@ -8,7 +8,7 @@ const useBeanRegExp = /<jsp:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:cla
 
 /**
  * The live time of the detected elements i.e. the refresh rate
- * @type {Number}
+ * @type {number}
  */
 const liveTime = 800;
 

@@ -8,7 +8,7 @@ import {TagFunctionDesc, VarDesc, KeywordDesc} from './desc-classes';
 
 /**
  * Context of the completion
- * @enum {Number}
+ * @enum {number}
  */
 const Context = {
     PROPERTY: 1,
@@ -29,7 +29,7 @@ const contextTests = [{
 
 /**
  * detects the context of the completion
- * @param  {String} preCourser
+ * @param   {string} preCursor part of the expression before the cursor
  * @returns {Context}
  */
 function getcompletionContext(preCourser) {
@@ -60,8 +60,8 @@ function getCompletionPrefix(preCourser) {
 
 /**
  * Cuts off the `${` at the start and `}` at the end of an EL expression
- * @param   {String} exp
- * @returns {String}
+ * @param   {string} exp
+ * @returns {string}
  */
 function cutOffExpressionMarks(exp) {
     return exp.replace(/^\$\{/, '')

@@ -3,9 +3,9 @@
 /**
  * Test whether a given function returns true for any of the supplied values
  *
- * @param  {Array}   values
- * @param  {Funtion} testFn
- * @return {boolean}
+ * @param   {Array}   values
+ * @param   {Funtion} testFn
+ * @returns {boolean}
  */
 export function oneTrue(values, testFn) {
     for (let i = 0; i < values.length; i += 1) {
