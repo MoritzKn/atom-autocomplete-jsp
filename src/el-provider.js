@@ -32,8 +32,8 @@ const contextTests = [{
  * @param   {string} preCursor part of the expression before the cursor
  * @returns {Context}
  */
-function getcompletionContext(preCourser) {
-    return contextTests.filter(type => type.tester(preCourser))
+function getcompletionContext(preCursor) {
+    return contextTests.filter(type => type.tester(preCursor))
                        .map(type => type.type)[0];
 }
 
@@ -50,8 +50,8 @@ function getTypesForContext(context) {
     ]);
 }
 
-function getCompletionPrefix(preCourser) {
-    const result = preCourser.match(/([a-zA-Z][a-zA-Z0-9_:]*)$/);
+function getCompletionPrefix(preCursor) {
+    const result = preCursor.match(/([a-zA-Z][a-zA-Z0-9_:]*)$/);
     if (!result) {
         return null;
     }
@@ -73,15 +73,15 @@ function getExpressionInfo(editor, bufferPosition) {
     const tb = editor.tokenizedBuffer;
     const range = tb.bufferRangeForScopeAtPosition(scope, bufferPosition);
     const expression = cutOffExpressionMarks(editor.getTextInRange(range));
-    const preCourserRange = {
+    const preCursorRange = {
         start: range.start,
         end: bufferPosition,
     };
-    const preCourser = cutOffExpressionMarks(editor.getTextInBufferRange(preCourserRange));
+    const preCursor = cutOffExpressionMarks(editor.getTextInBufferRange(preCursorRange));
 
     return {
-        courserPos: preCourser.length,
-        preCourser,
+        cursorPos: preCursor.length,
+        preCursor,
         expression,
     };
 }
@@ -98,8 +98,8 @@ export default {
     excludeLowerPriority: true,
 
     getSuggestions: ({editor, bufferPosition, activatedManually}) => {
-        const {preCourser} = getExpressionInfo(editor, bufferPosition);
-        const replacementPrefix = getCompletionPrefix(preCourser);
+        const {preCursor} = getExpressionInfo(editor, bufferPosition);
+        const replacementPrefix = getCompletionPrefix(preCursor);
 
         if (!replacementPrefix) {
             return [];
