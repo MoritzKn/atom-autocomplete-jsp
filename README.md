@@ -1,22 +1,35 @@
-# Atom autocomplete+ provider for JSP
+# JSP Autocomplete package
 [![Build Status](https://travis-ci.org/MoritzKn/atom-autocomplete-jsp.svg?branch=master)](https://travis-ci.org/MoritzKn/atom-autocomplete-jsp)
 
+This [Atom](https://atom.io) package adds autocompletion support for JSP with focus on it's subset JSPX.  Uses the [autocomplete-plus](https://github.com/atom-community/autocomplete-plus) package.
 
-This [Atom](https://atom.io) package adds autocompletion support for JSP with focus on it's subset JSPX.
-
-**Warning:**
-This package is in a very early stage.
-
-![Screenshot of Atom with autocomplete-jsp][screenshot]
+See [setup][setup] and [changelog][changelog]
 
 ## Features
-- EL autocompletion for implicit objects
-- EL autocompletion based on `.tld` files
-- EL autocompletion for varibles defined in tags such as `<c:set var"foo" value="bar"/>`
+### Autocompletion for implicit objects
+![Screenshot of autocompletion for implicit objects][screenshot-implicit-objects]
+
+### Autocompletion for EL keywords
+![Screenshot of autocompletion for keywords][screenshot-keywords]
+
+### Autocompletion for variables defined in tags
+![Screenshot of autocompletion for variables][screenshot-tags-set]
+
+### Autocompletion for variables from `<jsp:useBean>` tags
+![Screenshot of autocompletion for variables][screenshot-tags-use-bean]
+
+### Autocompletion of tag functions from `.tld` files
+![Screenshot of autocompletion for el-functions][screenshot-tag-functions]
+
+See [setup][setup] for an explanation how to get autocompletion based on `.tld` files to work.
+
+### Abbreviations
+![Autocompletion for abbreviations][screenshot-abbreviations]
+
 
 ## Goals
 - Tag autocompletion based on `.tld` files
-- EL autocompletion for imported beans
+- EL autocompletion for properties
 
 ## What this package won't do
 - Autocomplete embedded Java code
@@ -24,5 +37,39 @@ This package is in a very early stage.
 ## Config
 - `tldSources`: array of directories containing tld files
 
+## Setup
+1. Install this package  
+```sh
+apm install autocomplete-jsp
+```
 
-[screenshot]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-minimal.png
+2. Set the configuration `autocomplete-jsp.tldSources` to a directory of your choice, for example `~/tlds` and make sure this directory exist.  
+```
+mkdir ~/tlds
+```
+
+3. Make sure all [JSTL][jstl] TLDs are in this directory  
+```
+cd ~/tlds
+wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/fn.tld
+wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/c.tld
+wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/fmt.tld
+wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/sql.tld
+wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/x.tld
+```
+
+4. Copy all your custom `.tld` files into this directory
+```
+cp ~/workspace/someProject/src/main/resources/WEB-INF/*.tld ~/tlds
+```
+
+[setup]: https://github.com/MoritzKn/atom-autocomplete-jsp/blob/master/README.md#setup
+[changelog]: https://github.com/MoritzKn/atom-autocomplete-jsp/blob/master/CHANGELOG.md
+[jstl]: https://jstl.java.net/
+
+[screenshot-implicit-objects]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-implicit-objects.png
+[screenshot-keywords]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-keywords.png
+[screenshot-tags-set]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tags-set.png
+[screenshot-tags-use-bean]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tags-use-bean.png
+[screenshot-tag-functions]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tag-functions.png
+[screenshot-abbreviations]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-abbreviations.png
