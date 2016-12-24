@@ -2,6 +2,7 @@
 
 import * as registry from '../registry';
 import {VarDesc} from '../desc-classes';
+import {extractAttributes} from '../utils';
 
 const varRegExp = /<[a-zA-Z][a-zA-Z0-3_]*:[a-zA-Z][a-zA-Z0-3_]+\s+[^>]*var="([^"]*)"[^>]*>/g;
 const useBeanRegExp = /<jsp:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:class|id)="[^"]*"\s*)[^>]*\/?>/g;
@@ -50,21 +51,11 @@ export function register() {
             });
         });
 
-        editorText.replace(useBeanRegExp, (match, firstAttr, secondAttr) => {
-            const classRegExp = /class="([^"]*)"/;
-            const idRegExp = /id="([^"]*)"/;
+        editorText.replace(useBeanRegExp, (matchText) => {
+            const attributes = extractAttributes(matchText, ['id', 'class']);
 
-            let idMatch = firstAttr.match(idRegExp);
-            let classMatch = secondAttr.match(classRegExp);
-            if (!idMatch) {
-                idMatch = secondAttr.match(idRegExp);
-            }
-            if (!classMatch) {
-                classMatch = firstAttr.match(classRegExp);
-            }
-
-            const classValue = classMatch[1];
-            const idValue = idMatch[1];
+            const idValue = attributes.id;
+            const classValue = attributes.class;
 
             const otherRefs = registry.getAll({ type: VarDesc, name: idValue }, false);
 
