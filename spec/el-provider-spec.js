@@ -4,6 +4,7 @@
 describe('JSP autocompletions', () => {
     let editor;
     let provider;
+    let pgkPath;
 
     function getCompletions(activatedManually=false) {
         const cursor = editor.getLastCursor();
@@ -21,6 +22,22 @@ describe('JSP autocompletions', () => {
         });
     }
 
+    function getCompletion(filter, activatedManually=false) {
+        const completions = getCompletions(activatedManually);
+
+        const matchingCompletions = completions.filter(comp =>
+            (comp.text || comp.snippet).includes(filter));
+
+        return matchingCompletions[0];
+    }
+
+    function loadTestTld() {
+        const testTld = `${pgkPath}/spec/fixtures/tlds/test.tld`;
+
+        waitsForPromise(() =>
+            require(`${pgkPath}/src/sources/tlds`).readAndRegisterTlds([testTld]));
+    }
+
     beforeEach(() => {
         waitsForPromise(() => atom.packages.activatePackage('autocomplete-jsp'));
         waitsForPromise(() => atom.packages.activatePackage('language-java'));
@@ -30,6 +47,8 @@ describe('JSP autocompletions', () => {
             const providers = pkg.mainModule.getProviders();
             const selector = '.text.html.jsp .el_expression';
             provider = providers.filter(p => p.selector === selector)[0];
+
+            pgkPath = atom.packages.loadPackage('autocomplete-jsp').path;
         });
 
         waitsForPromise(() => atom.workspace.open('test.jsp'));
@@ -68,14 +87,7 @@ describe('JSP autocompletions', () => {
         editor.setText(text);
         editor.setCursorBufferPosition([0, text.length - 1]);
 
-        const completions = getCompletions(true);
-
-        const matchingCompletions = completions.filter(comp => {
-            const completion = comp.text || comp.snippet;
-            return completion.includes('not');
-        });
-
-        const completion = matchingCompletions[0];
+        const completion = getCompletion('not', true);
         expect(completion).toBeDefined();
         if (completion) {
             expect(completion.leftLabel).toBeUndefined();
@@ -92,14 +104,7 @@ describe('JSP autocompletions', () => {
         editor.setText(text);
         editor.setCursorBufferPosition([0, text.length - 1]);
 
-        const completions = getCompletions(true);
-
-        const matchingCompletions = completions.filter(comp => {
-            const completion = comp.text || comp.snippet;
-            return completion.includes('ne');
-        });
-
-        const completion = matchingCompletions[0];
+        const completion = getCompletion('ne', true);
         expect(completion).toBeDefined();
         if (completion) {
             expect(completion.leftLabel).toBeUndefined();
@@ -117,14 +122,7 @@ describe('JSP autocompletions', () => {
         editor.setText(text);
         editor.setCursorBufferPosition([0, text.length - 1]);
 
-        const completions = getCompletions(true);
-
-        const matchingCompletions = completions.filter(comp => {
-            const completion = comp.text || comp.snippet;
-            return completion.includes('initParam');
-        });
-
-        const completion = matchingCompletions[0];
+        const completion = getCompletion('initParam', true);
         expect(completion).toBeDefined();
         if (completion) {
             expect(completion.leftLabel).toBe('Map');
@@ -141,14 +139,7 @@ describe('JSP autocompletions', () => {
         editor.setText(text);
         editor.setCursorBufferPosition([0, text.length - 1]);
 
-        const completions = getCompletions(true);
-
-        const matchingCompletions = completions.filter(comp => {
-            const completion = comp.text || comp.snippet;
-            return completion.includes('initParam');
-        });
-
-        const completion = matchingCompletions[0];
+        const completion = getCompletion('initParam', true);
         expect(completion).toBeDefined();
     });
 
@@ -163,13 +154,7 @@ describe('JSP autocompletions', () => {
         editor.setCursorBufferPosition([1, text.length - 1]);
 
         setTimeout(function () {
-            const completions = getCompletions(true);
-            const matchingCompletions = completions.filter(comp => {
-                const completion = comp.text || comp.snippet;
-                return completion.includes('fooBarBaz');
-            });
-
-            const completion = matchingCompletions[0];
+            const completion = getCompletion('fooBarBaz', true);
             expect(completion).toBeDefined();
             if (completion) {
                 expect(completion.leftLabel).toBeUndefined();
