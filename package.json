@@ -1,7 +1,7 @@
 {
   "name": "autocomplete-jsp",
   "main": "src/main.js",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Atom autocomplete+ provider for JSP / JSPX",
   "repository": {
     "type": "git",
