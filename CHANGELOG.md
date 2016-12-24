@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 0.4.1 - 2016-12-24
+### Changed
+- README
+
 ## 0.4.0 - 2016-12-24
 ### Changed
 - Only show autocompletion from imported taglibs. Taglibs can be imported with:
