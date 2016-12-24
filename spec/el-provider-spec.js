@@ -168,7 +168,7 @@ describe('JSP autocompletions', () => {
     });
 
 
-    it('returns completions for references from `<jsp:useBean>`', (done) => {
+    it('returns completions for references from `<jsp:useBean>`', () => {
         atom.config.set('autocomplete-jsp.tldSources', '');
 
         editor.setText('');
@@ -177,24 +177,30 @@ describe('JSP autocompletions', () => {
         editor.buffer.append(text);
         editor.setCursorBufferPosition([1, text.length - 1]);
 
-        setTimeout(function () {
-            const completions = getCompletions(true);
-            const matchingCompletions = completions.filter(comp => {
-                const completion = comp.text || comp.snippet;
-                return completion.includes('myMap');
-            });
+        const {VarDesc} = require(`${pgkPath}/src/desc-classes`);
+        const registry = require(`${pgkPath}/src/registry`);
 
-            const completion = matchingCompletions[0];
+        waitsFor(() => {
+            return registry.getAll({
+                type: VarDesc,
+                filter: [{
+                    name: 'name',
+                    value: 'myMap',
+                }],
+            }).length > 0;
+        }, 600);
+
+        runs(() => {
+            const completion = getCompletion('myMap', true);
             expect(completion).toBeDefined();
+
             if (completion) {
                 expect(completion.leftLabel).toBe('HashMap');
                 expect(completion.type).toBe('variable');
-                expect(completion.description).toBeUndefined();
-                expect(completion.replacementPrefix).toBe('myMa:');
+                expect(completion.description).toBe('');
+                expect(completion.replacementPrefix).toBe('myMa');
             }
-
-            done();
-        }, 1000);
+        });
     });
 
     it('returns completions from `.tld` files', (done) => {
