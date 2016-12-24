@@ -6,18 +6,20 @@ import {TaglibDesc, TagFunctionDesc, TagDesc, TagAttrDesc} from '../desc-classes
 import {add as addToRegistry} from '../registry';
 import {getDeepPropSave as gdps} from '../utils';
 
+const methodSignatureRegExp = new RegExp(
+    // return type
+    // e.g. java.lang.String
+    '((?:[a-zA-Z_][a-zA-Z_0-9]*\\.)*[a-zA-Z_][a-zA-Z_0-9\\[\\]]*)\\s+' +
+    // function name
+    // e.g. toUpperCase
+    '([a-zA-Z_][a-zA-Z_0-9]*)\\s*' +
+    // arguments
+    // e.g. (java.lang.String, java.lang.Boolean)
+    '\\(\\s*([a-zA-Z_0-9,. \\[\\]]*)\\s*\\)'
+);
+
 function parseMethodSignature(signature) {
-    const res = signature.match(new RegExp(
-        // return type
-        // e.g. java.lang.String
-        '((?:[a-zA-Z_][a-zA-Z_0-9]*\\.)*[a-zA-Z_][a-zA-Z_0-9\\[\\]]*)\\s+' +
-        // function name
-        // e.g. toUpperCase
-        '([a-zA-Z_][a-zA-Z_0-9]*)\\s*' +
-        // arguments
-        // e.g. (java.lang.String, java.lang.Boolean)
-        '\\(\\s*([a-zA-Z_0-9,. \\[\\]]*)\\s*\\)'
-    ));
+    const res = signature.match(methodSignatureRegExp);
 
     if (!res) {
         throw new Error(`"${signature}" is not a valid method signature`);
