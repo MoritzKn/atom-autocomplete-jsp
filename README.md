@@ -38,17 +38,17 @@ See [setup][setup] for an explanation how to get autocompletion based on `.tld` 
 - `tldSources`: array of directories containing tld files
 
 ## Setup
-1. Install this package  
+* Install this package 
 ```sh
 apm install autocomplete-jsp
 ```
 
-2. Set the configuration `autocomplete-jsp.tldSources` to a directory of your choice, for example `~/tlds` and make sure this directory exist.  
+* Set the configuration `autocomplete-jsp.tldSources` to a directory of your choice, for example `~/tlds` and make sure this directory exist. 
 ```
 mkdir ~/tlds
 ```
 
-3. Make sure all [JSTL][jstl] TLDs are in this directory  
+* Make sure all [JSTL][jstl] TLDs are in this directory 
 ```
 cd ~/tlds
 wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/fn.tld
@@ -58,7 +58,7 @@ wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/MET
 wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/x.tld
 ```
 
-4. Copy all your custom `.tld` files into this directory
+* Copy all your custom `.tld` files into this directory 
 ```
 cp ~/workspace/someProject/src/main/resources/WEB-INF/*.tld ~/tlds
 ```
