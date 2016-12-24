@@ -149,8 +149,9 @@ export function readAndRegisterTlds(paths) {
         .then(tldDescs => tldDescs
             // TODO: reload on file change
             .forEach(tldDesc => {
-                tldDesc.functions.forEach(element => addToRegistry({element}));
-                tldDesc.tags.forEach(element => addToRegistry({element}));
+                addToRegistry({ element: tldDesc });
+                tldDesc.functions.forEach(desc => addToRegistry({ element: desc }));
+                tldDesc.tags.forEach(desc => addToRegistry({ element: desc }));
             })
         );
 }

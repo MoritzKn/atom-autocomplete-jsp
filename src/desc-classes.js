@@ -50,7 +50,7 @@ export class TaglibDesc {
         this.tags = initData.tags || [];
     }
 
-    filter(prefix) {
+    filter({prefix}) {
         return check(this.shortName, prefix);
     }
 
@@ -90,8 +90,7 @@ export class TagFunctionDesc {
         this.snippet = this.getSnippet();
     }
 
-    getSnippet() {
-       const ns = this.taglib.shortName;
+    getSnippet(ns) {
        const name = this.name;
        const args = this.argumentTypes;
        const argsStr = args
@@ -101,8 +100,21 @@ export class TagFunctionDesc {
        return `${ns}:${name}(${argsStr})`;
    }
 
-    filter(prefix) {
-        const ns = this.taglib.shortName;
+    filter({prefix, usedTaglibs}) {
+        let ns;
+
+        usedTaglibs.forEach(item => {
+            if (item.desc === this.taglib) {
+                ns = item.prefix;
+            }
+        });
+
+        if (typeof ns === 'undefined') {
+            return false;
+        }
+
+        ns = ns.toLowerCase();
+
         if (ns.startsWith(prefix) || prefix.startsWith(ns)) {
             const test1 = `${ns}:${this.name}`.toLowerCase();
             const test2 = `${ns}:${this.abbreviatedName}`.toLowerCase();
@@ -114,9 +126,21 @@ export class TagFunctionDesc {
         }
     }
 
-    suggestion({replacementPrefix}) {
+    suggestion({replacementPrefix, usedTaglibs}) {
+        let ns;
+
+        usedTaglibs.forEach(item => {
+            if (item.desc === this.taglib) {
+                ns = item.prefix;
+            }
+        });
+
+        if (typeof ns === 'undefined') {
+            throw new Error(`Expected usedTaglibs to contain ${this.tld}`);
+        }
+
         return {
-            snippet: this.snippet,
+            snippet: this.getSnippet(ns),
             leftLabel: this.shortReturnType,
             description: this.description,
             type: 'function',
@@ -145,7 +169,7 @@ export class TagDesc {
         this.attributes = initData.attributes || [];
     }
 
-    filter(prefix) {
+    filter({prefix}) {
         return check(this.name, prefix) ||
                check(this.abbreviatedName, prefix);
     }
@@ -190,7 +214,7 @@ export class TagAttrDesc {
        }
    }
 
-    filter(prefix) {
+    filter({prefix}) {
         return check(this.name, prefix) ||
                check(this.abbreviatedName, prefix);
     }
@@ -220,7 +244,7 @@ export class VarDesc {
         this.shortType = this.type ? toShortType(this.type) : '';
     }
 
-    filter(prefix) {
+    filter({prefix}) {
         return check(this.name, prefix) ||
                check(this.abbreviatedName, prefix);
     }
@@ -250,7 +274,7 @@ export class KeywordDesc {
         this.snippet = this.getSnippet();
     }
 
-    filter(prefix) {
+    filter({prefix}) {
         return check(this.keyword, prefix);
     }
 

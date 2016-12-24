@@ -203,37 +203,88 @@ describe('JSP autocompletions', () => {
         });
     });
 
-    it('returns completions from `.tld` files', (done) => {
+    it('returns no completions from `.tld` files if they are not imported', () => {
         atom.config.set('autocomplete-jsp.tldSources', `${__dirname}/fixtures/tlds/`);
+        loadTestTld();
 
         const text = '${ts:}';
         editor.setText(text);
         editor.setCursorBufferPosition([1, text.length - 1]);
 
-        const pgkPath = atom.packages.loadPackage('autocomplete-jsp').path;
-        const testTld = `${pgkPath}/spec/fixtures/tlds/test.tld`;
+        runs(() => {
+            const completion = getCompletion('ts:concat', true);
+            expect(completion).toBeUndefined();
+        });
+    });
 
-        require(`${pgkPath}/src/sources/tlds`).readAndRegisterTlds([testTld])
-            .then(() => {
+    it('returns completions from `.tld` files if imported with taglib directive', () => {
+        atom.config.set('autocomplete-jsp.tldSources', `${__dirname}/fixtures/tlds/`);
+        loadTestTld();
 
-                const completions = getCompletions(true);
+        editor.setText('');
+        editor.buffer.append('<%@ taglib\n');
+        editor.buffer.append('uri="http://example.com/jsp/test" prefix="prefixOfTag" %>\n');
+        editor.buffer.append('\n');
+        const text = '${prefixOfTag:}';
+        editor.buffer.append(text);
+        editor.setCursorBufferPosition([3, text.length - 1]);
 
-                const matchingCompletions = completions.filter(comp => {
-                    const completion = comp.text || comp.snippet;
-                    return completion.includes('ts:concat');
-                });
+        runs(() => {
+            const completion = getCompletion('prefixOfTag:concat', true);
+            expect(completion).toBeDefined();
+            if (completion) {
+                expect(completion.description).toBe('Concatenates two strings.');
+                expect(completion.leftLabel).toBe('String');
+                expect(completion.type).toBe('function');
+                expect(completion.replacementPrefix).toBe('prefixOfTag:');
+            }
+        });
+    });
 
-                const completion = matchingCompletions[0];
-                expect(completion).toBeDefined();
-                if (completion) {
-                    expect(completion.description).toBe('Concatenates two strings.');
-                    expect(completion.leftLabel).toBe('String');
-                    expect(completion.type).toBe('function');
-                    expect(completion.replacementPrefix).toBe('ts:');
-                }
+    it('returns completions from `.tld` files if imported with xml taglib directive', () => {
+        atom.config.set('autocomplete-jsp.tldSources', `${__dirname}/fixtures/tlds/`);
+        loadTestTld();
 
-                done();
+        editor.setText('');
+        editor.buffer.append('<jsp:directive.taglib uri="http://example.com/jsp/test" prefix="prefixOfTag" />\n');
+        editor.buffer.append('\n');
+        const text = '${prefixOfTag:}';
+        editor.buffer.append(text);
+        editor.setCursorBufferPosition([2, text.length - 1]);
 
-            }).catch(() => done.fail());
+        runs(() => {
+            const completion = getCompletion('prefixOfTag:concat', true);
+            expect(completion).toBeDefined();
+            if (completion) {
+                expect(completion.description).toBe('Concatenates two strings.');
+                expect(completion.leftLabel).toBe('String');
+                expect(completion.type).toBe('function');
+                expect(completion.replacementPrefix).toBe('prefixOfTag:');
+            }
+        });
+    });
+
+    it('returns completions from `.tld` files if imported as xml namespace', () => {
+        atom.config.set('autocomplete-jsp.tldSources', `${__dirname}/fixtures/tlds/`);
+        loadTestTld();
+
+        editor.setText('');
+        editor.buffer.append('<jsp:root xmlns:prefixOfTag="http://example.com/jsp/test">\n');
+        editor.buffer.append('\n');
+        const text = '${prefixOfTag:}';
+        editor.buffer.append(text);
+
+        editor.setCursorBufferPosition([2, text.length - 1]);
+
+        runs(() => {
+            const completion = getCompletion('prefixOfTag:concat', true);
+            expect(completion).toBeDefined();
+            if (completion) {
+                expect(completion.description).toBe('Concatenates two strings.');
+                expect(completion.leftLabel).toBe('String');
+                expect(completion.type).toBe('function');
+                expect(completion.replacementPrefix).toBe('prefixOfTag:');
+            }
+        });
     });
 });

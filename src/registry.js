@@ -71,7 +71,7 @@ export function add(options) {
     registry.set(id, entry);
 }
 
-export function getAll({type, name}={}, doRefresh=true) {
+export function getAll({type, filter=[]}={}, doRefresh=true) {
     if (doRefresh) {
         refresh();
     }
@@ -85,8 +85,16 @@ export function getAll({type, name}={}, doRefresh=true) {
             return;
         }
 
-        if (name && element.name !== name) {
-            return;
+        for (let attr of filter) {
+            if (attr.value) {
+                if (element[attr.name] !== attr.value) {
+                    return;
+                }
+            } else if (attr.values) {
+                if (!attr.values.includes(element[attr.name])) {
+                    return;
+                }
+            }
         }
 
         if (element) {

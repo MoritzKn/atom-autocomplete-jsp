@@ -37,8 +37,14 @@ export function register() {
         };
 
         // Use replace because it's the only way to get all matches and all groups
-        editorText.replace(varRegExp, (match, name) => {
-            const otherRefs = registry.getAll({ type: VarDesc, name }, false);
+        editorText.replace(varRegExp, (matchText, name) => {
+            const otherRefs = registry.getAll({
+                type: VarDesc,
+                filter: [{
+                    name: 'name',
+                    value: name,
+                }],
+            }, false);
 
             if (otherRefs.length > 0) {
                 return;
@@ -57,7 +63,13 @@ export function register() {
             const idValue = attributes.id;
             const classValue = attributes.class;
 
-            const otherRefs = registry.getAll({ type: VarDesc, name: idValue }, false);
+            const otherRefs = registry.getAll({
+                type: VarDesc,
+                filter: [{
+                    name: 'name',
+                    value: idValue,
+                }],
+            }, false);
 
             if (otherRefs.length > 0) {
                 return;
