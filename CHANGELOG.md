@@ -6,13 +6,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 0.4.0 - 2016-12-24
+### Changed
+- Only show autocompletion from imported taglibs. Taglibs can be imported with:
+    - The taglib directive (`<%@ taglib uri="uri" prefix="tagPrefix" >`)
+    - The XML equivalent of the taglib directive (`<jsp:directive.taglib uri="uri" prefix="tagPrefix" />`)
+    - As XML namespace (`<jsp:root xmlns:tagPrefix="uri">`)
+
+### Fixed
+- Use dynamic prefix for EL-Functions. Previously the `short-name` from the taglib was used, now the prefix from the taglib directive is used.
+
 ## 0.3.3 - 2016-12-16
-## Changed
-- Only show autocompleteion if the prefix is longer or equal then the
+### Changed
+- Only show autocompletion if the prefix is longer or equal then the
   `autocomplete-plus.minimumWordLength` configuration or the autocompletion was triggered
   by `autocomplete-plus:activate` (<kbd>Ctrl-Space</kbd>)
 
-## Added
+### Added
 - A label with the full name for keyword e.g. `less or equal` for `eq`
 - Specs for the EL-provider
 
