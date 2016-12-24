@@ -24,7 +24,7 @@
   ],
   "scripts": {
     "lint": "./node_modules/jshint/bin/jshint src/**.js spec/**js",
-    "test": "npm run lint"
+    "test": "npm run lint && apm test"
   },
   "engines": {
     "atom": ">=1.0.0"
