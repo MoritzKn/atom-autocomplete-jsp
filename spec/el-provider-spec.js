@@ -6,6 +6,10 @@ describe('JSP autocompletions', () => {
     let provider;
     let pgkPath;
 
+    let VarDesc;
+    let registry;
+    let sourceTlds;
+
     function getCompletions(activatedManually=false) {
         const cursor = editor.getLastCursor();
         const start = cursor.getBeginningOfCurrentWordBufferPosition();
@@ -35,7 +39,17 @@ describe('JSP autocompletions', () => {
         const testTld = `${pgkPath}/spec/fixtures/tlds/test.tld`;
 
         waitsForPromise(() =>
-            require(`${pgkPath}/src/sources/tlds`).readAndRegisterTlds([testTld]));
+            sourceTlds.readAndRegisterTlds([testTld]));
+    }
+
+    function varInReg(varName) {
+        return registry.getAll({
+            type: VarDesc,
+            filter: [{
+                name: 'name',
+                value: varName,
+            }],
+        }).length > 0;
     }
 
     beforeEach(() => {
@@ -44,11 +58,15 @@ describe('JSP autocompletions', () => {
 
         runs(() => {
             const pkg = atom.packages.getActivePackage('autocomplete-jsp');
-            const providers = pkg.mainModule.getProviders();
+            pgkPath = atom.packages.loadPackage('autocomplete-jsp').path;
+
             const selector = '.text.html.jsp .el_expression';
+            const providers = pkg.mainModule.getProviders();
             provider = providers.filter(p => p.selector === selector)[0];
 
-            pgkPath = atom.packages.loadPackage('autocomplete-jsp').path;
+            VarDesc = require(`${pgkPath}/src/desc-classes`).VarDesc;
+            registry = require(`${pgkPath}/src/registry`);
+            sourceTlds = require(`${pgkPath}/src/sources/tlds`);
         });
 
         waitsForPromise(() => atom.workspace.open('test.jsp'));
@@ -143,28 +161,27 @@ describe('JSP autocompletions', () => {
         expect(completion).toBeDefined();
     });
 
-    it('returns completions for variables defined in `<c:set var="fooBarBaz">`', (done) => {
+    it('returns completions for variables defined in `<c:set var="fooBarBaz">`', () => {
         atom.config.set('autocomplete-jsp.tldSources', '');
 
         editor.setText('');
         editor.buffer.append('<c:set var="fooBarBaz">\n');
         const text = '${fooBa}';
         editor.buffer.append(text);
-
         editor.setCursorBufferPosition([1, text.length - 1]);
 
-        setTimeout(function () {
+        waitsFor(() => varInReg('fooBarBaz'), 1200);
+
+        runs(() => {
             const completion = getCompletion('fooBarBaz', true);
             expect(completion).toBeDefined();
             if (completion) {
-                expect(completion.leftLabel).toBeUndefined();
+                expect(completion.leftLabel).toBe('');
                 expect(completion.type).toBe('variable');
-                expect(completion.description).toBeUndefined();
-                expect(completion.replacementPrefix).toBe('fooBa:');
+                expect(completion.description).toBe('');
+                expect(completion.replacementPrefix).toBe('fooBa');
             }
-
-            done();
-        }, 1000);
+        });
     });
 
 
@@ -177,18 +194,7 @@ describe('JSP autocompletions', () => {
         editor.buffer.append(text);
         editor.setCursorBufferPosition([1, text.length - 1]);
 
-        const {VarDesc} = require(`${pgkPath}/src/desc-classes`);
-        const registry = require(`${pgkPath}/src/registry`);
-
-        waitsFor(() => {
-            return registry.getAll({
-                type: VarDesc,
-                filter: [{
-                    name: 'name',
-                    value: 'myMap',
-                }],
-            }).length > 0;
-        }, 600);
+        waitsFor(() => varInReg('myMap'), 1200);
 
         runs(() => {
             const completion = getCompletion('myMap', true);
