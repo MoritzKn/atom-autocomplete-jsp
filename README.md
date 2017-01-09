@@ -44,12 +44,12 @@ apm install autocomplete-jsp
 ```
 
 * Set the configuration `autocomplete-jsp.tldSources` to a directory of your choice, for example `~/tlds` and make sure this directory exist. 
-```
+```sh
 mkdir ~/tlds
 ```
 
 * Make sure all [JSTL][jstl] TLDs are in this directory 
-```
+```sh
 cd ~/tlds
 wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/fn.tld
 wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/c.tld
@@ -59,7 +59,7 @@ wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/MET
 ```
 
 * Copy all your custom `.tld` files into this directory 
-```
+```sh
 cp ~/workspace/someProject/src/main/resources/WEB-INF/*.tld ~/tlds
 # or even
 cp ~/workspace/*/src/**.tld ~/tlds/
