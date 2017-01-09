@@ -61,7 +61,10 @@ wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/MET
 * Copy all your custom `.tld` files into this directory 
 ```
 cp ~/workspace/someProject/src/main/resources/WEB-INF/*.tld ~/tlds
+# or even
+cp ~/workspace/*/src/**.tld ~/tlds/
 ```
+
 
 [setup]: https://github.com/MoritzKn/atom-autocomplete-jsp/blob/master/README.md#setup
 [changelog]: https://github.com/MoritzKn/atom-autocomplete-jsp/blob/master/CHANGELOG.md
