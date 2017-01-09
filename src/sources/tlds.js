@@ -15,7 +15,7 @@ const methodSignatureRegExp = new RegExp(
     '([a-zA-Z_][a-zA-Z_0-9]*)\\s*' +
     // arguments
     // e.g. (java.lang.String, java.lang.Boolean)
-    '\\(\\s*([a-zA-Z_0-9,. \\[\\]]*)\\s*\\)'
+    '\\(\\s*([a-zA-Z_0-9,.\\s\\[\\]]*)\\s*\\)'
 );
 
 function parseMethodSignature(signature) {
