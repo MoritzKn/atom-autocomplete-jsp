@@ -24,7 +24,7 @@ export function getDeepPropSave(obj, ...path) {
 }
 
 
-export const attrRegExp = (function() {
+export const attrRegExp = (() => {
     let cache = {};
 
     return function attrRegExp(name) {
@@ -45,17 +45,14 @@ export const attrRegExp = (function() {
  * @param   {string} attributesNames
  * @returns {Object} an object with that maps the attribute names to there values
  */
-export function extractAttributes(text, attributesNames) {
+export function extractAttributes(text) {
     const attributes = {};
-
-    attributesNames.forEach(name => {
-        const res = text.match(attrRegExp(name));
-        if (res && res[1]) {
-            attributes[name] = res[1];
-        } else {
-            attributes[name] = undefined;
-        }
-    });
-
+    const attrMatch = text.match(/[a-zA-Z0-9_\-]+="[^"]*"/g);
+    if (attrMatch) {
+        attrMatch.forEach(attrStr => {
+            const [, name, value] = attrStr.match(/([a-zA-Z0-9_\-]+)="([^"]*)"/);
+            attributes[name] = value;
+        });
+    }
     return attributes;
 }

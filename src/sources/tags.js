@@ -58,7 +58,7 @@ export function register() {
         });
 
         editorText.replace(useBeanRegExp, (matchText) => {
-            const attributes = extractAttributes(matchText, ['id', 'class']);
+            const attributes = extractAttributes(matchText);
 
             const idValue = attributes.id;
             const classValue = attributes.class;
