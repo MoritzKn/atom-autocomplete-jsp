@@ -22,7 +22,7 @@ function toShortType(longName) {
  * @returns {boolean}       - add suggestion?
  */
 function check(name, prefix) {
-    if (!name || !prefix) {
+    if (!name) {
         return false;
     }
 
@@ -192,11 +192,70 @@ export class TagDesc extends GenericDesc {
         this.attributes = initData.attributes || [];
     }
 
-    suggestion({replacementPrefix}) {
+    getSnippet(ns) {
+        const requiredAttrs = this.attributes.filter(attrDesc => attrDesc.required);
+        const selfClosing = this.content === 'empty';
+
+        const getEnd = snippetIndex => {
+            let attrJump = this.attributes.length - requiredAttrs.length > 0 ? snippetJump(snippetIndex) : '';
+
+            if (selfClosing) {
+                return `${attrJump}/>$0`;
+            } else {
+                return `${attrJump}>$0</${ns}:${this.name}>`;
+            }
+        };
+
+        if (requiredAttrs.length > 0) {
+            const attrsStr = requiredAttrs
+                .map((attrDesc, i) => attrDesc.getSnippet(i + 1))
+                .join(' ');
+
+            return `${ns}:${this.name} ${attrsStr}${getEnd(requiredAttrs.length + 1)}`;
+        } else {
+            return `${ns}:${this.name}${getEnd(1)}`;
+        }
+    }
+
+    filter({prefix, usedTaglibs}) {
+        const ns = getTaglibNamespace(usedTaglibs, this.taglib);
+        if (typeof ns === 'undefined') {
+            return false;
+        }
+        const nsLower = ns.toLowerCase();
+        if (nsLower.startsWith(prefix) || prefix.startsWith(nsLower)) {
+            const test1 = `${nsLower}:${this.name}`.toLowerCase();
+            const test2 = `${nsLower}:${this.abbreviatedName}`.toLowerCase();
+            return test1.startsWith(prefix) || test2.startsWith(prefix);
+        } else {
+            const test1 = `${this.name}`.toLowerCase();
+            const test2 = `${this.abbreviatedName}`.toLowerCase();
+            return test1.startsWith(prefix) || test2.startsWith(prefix);
+        }
+    }
+
+    suggestion({replacementPrefix, usedTaglibs, onlyTagName, isClosingTag}) {
+        const ns = getTaglibNamespace(usedTaglibs, this.taglib);
+        if (typeof ns === 'undefined') {
+            throw new Error(`Expected "usedTaglibs" to contain ${this.tld}`);
+        }
+
+
+        const snippet = (() => {
+            if (onlyTagName) {
+                return `${ns}:${this.name}`;
+            } else if (isClosingTag) {
+                return `${ns}:${this.name}>`;
+            } else {
+                return this.getSnippet(ns);
+            }
+        })();
+
         return {
-            text: this.name,
+            snippet,
+            displayText: `${ns}:${this.name}`,
+            type: 'tag',
             description: this.description,
-            type: 'variable',
             replacementPrefix,
         };
     }
@@ -227,19 +286,33 @@ export class TagAttrDesc extends GenericDesc {
         this.snippet = this.getSnippet();
     }
 
-    getSnippet() {
-       if (this.shortType) {
-           return `${this.name}="\${1:${this.shortType}}"`;
-       } else {
-           return `${this.name}="$1"`;
-       }
-   }
+    getSnippet(index=1) {
+        const value = (() => {
+            if (!this.rtexprvalue) {
+                return snippetJump(index);
+            } else if (this.shortType === 'String') {
+                return snippetJump(index, wrapExp(this.shortType));
+            } else {
+                return wrapExp(snippetJump(index, this.shortType));
+            }
+        })();
+
+        return `${this.name}="${value}"`;
+    }
 
     suggestion({replacementPrefix}) {
+        const infos = [
+            !this.rtexprvalue ? 'static' : null,
+            this.shortType,
+            this.required ? 'required' : null,
+        ];
+
         return {
             snippet: this.snippet,
+            displayText: this.name,
             description: this.description,
-            type: 'variable',
+            type: 'attribute',
+            rightLabel: infos.filter(el => !!el).join(', '),
             replacementPrefix,
         };
     }
