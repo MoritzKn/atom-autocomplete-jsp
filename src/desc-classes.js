@@ -30,6 +30,33 @@ function check(name, prefix) {
            name.toLowerCase().startsWith(prefix);
 }
 
+function getTaglibNamespace(usedTaglibs, taglib) {
+    let ns;
+    usedTaglibs.forEach(item => {
+        if (item.desc === taglib) {
+            ns = item.prefix;
+        }
+    });
+    return ns;
+}
+
+function escapeSnippet(text) {
+    return text.replace(/[${}]/g, c => '\\' + c);
+}
+
+function snippetJump(index, content='') {
+    if (content) {
+        return '${' + index + ':' + escapeSnippet(content) + '}';
+    } else {
+        return '$' + index;
+    }
+}
+
+function wrapExp(content) {
+    return '${' + content + '}';
+}
+
+
 class GenericDesc {
     /**
      * @param {string} name
@@ -108,30 +135,21 @@ export class TagFunctionDesc extends GenericDesc {
         const name = this.name;
         const args = this.argumentTypes;
         const argsStr = args
-            .map((type, i) => `\${${i+1}:${toShortType(type)}}`)
+            .map((type, i) => snippetJump(i + 1, toShortType(type)))
             .join(', ');
 
         return `${ns}:${name}(${argsStr})`;
     }
 
     filter({prefix, usedTaglibs}) {
-        let ns;
-
-        usedTaglibs.forEach(item => {
-            if (item.desc === this.taglib) {
-                ns = item.prefix;
-            }
-        });
-
+        const ns = getTaglibNamespace(usedTaglibs, this.taglib);
         if (typeof ns === 'undefined') {
             return false;
         }
-
-        ns = ns.toLowerCase();
-
-        if (ns.startsWith(prefix) || prefix.startsWith(ns)) {
-            const test1 = `${ns}:${this.name}`.toLowerCase();
-            const test2 = `${ns}:${this.abbreviatedName}`.toLowerCase();
+        const nsLower = ns.toLowerCase();
+        if (nsLower.startsWith(prefix) || prefix.startsWith(nsLower)) {
+            const test1 = `${nsLower}:${this.name}`.toLowerCase();
+            const test2 = `${nsLower}:${this.abbreviatedName}`.toLowerCase();
             return test1.startsWith(prefix) || test2.startsWith(prefix);
         } else {
             const test1 = `${this.name}`.toLowerCase();
@@ -141,18 +159,10 @@ export class TagFunctionDesc extends GenericDesc {
     }
 
     suggestion({replacementPrefix, usedTaglibs}) {
-        let ns;
-
-        usedTaglibs.forEach(item => {
-            if (item.desc === this.taglib) {
-                ns = item.prefix;
-            }
-        });
-
+        const ns = getTaglibNamespace(usedTaglibs, this.taglib);
         if (typeof ns === 'undefined') {
             throw new Error(`Expected usedTaglibs to contain ${this.tld}`);
         }
-
         return {
             snippet: this.getSnippet(ns),
             leftLabel: this.shortReturnType,
@@ -271,16 +281,11 @@ export class KeywordDesc extends GenericDesc {
         super(initData.keyword || initData.name);
         this.fullName = (initData.fullName || '').trim();
         this.description = (initData.description || '').trim();
-        this.snippet = this.getSnippet();
-    }
-
-    getSnippet() {
-        return this.name + ' $0';
     }
 
     suggestion({replacementPrefix}) {
         return {
-            snippet: this.snippet,
+            text: this.name + ' ',
             rightLabel: this.fullName,
             description: this.description,
             type: 'keyword',
