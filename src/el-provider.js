@@ -122,6 +122,9 @@ function getExpressionInfo(editor, bufferPosition) {
     const scope = '.el_expression';
     const tb = editor.tokenizedBuffer;
     const range = tb.bufferRangeForScopeAtPosition(scope, bufferPosition);
+    if (!range) {
+        throw Error(`The bufferPosition (${bufferPosition}) has no expression scope`);
+    }
     const expression = cutOffExpressionMarks(editor.getTextInRange(range));
     const preCursorRange = {
         start: range.start,
