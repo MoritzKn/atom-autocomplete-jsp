@@ -170,7 +170,7 @@ export default {
         const validTypes = getTypesForContext(context);
 
         return getRegistryElements()
-            .filter(desc => oneTrue(validTypes, cons => desc instanceof cons))
+            .filter(desc => validTypes.some(cons => desc instanceof cons))
             .filter(desc => desc.filter({prefix, usedTaglibs}))
             .map(desc => desc.suggestion({replacementPrefix, usedTaglibs}));
     },

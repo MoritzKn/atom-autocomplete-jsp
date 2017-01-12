@@ -1,22 +1,6 @@
 'use babel';
 
 /**
- * Test whether a given function returns true for any of the supplied values
- *
- * @param   {Array}   values
- * @param   {Funtion} testFn
- * @returns {boolean}
- */
-export function oneTrue(values, testFn) {
-    for (let i = 0; i < values.length; i += 1) {
-        if (testFn(values[i])) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
  * Tries to get a property from nested objects, but stops if
  * any property on the path isn't an object.
  *
