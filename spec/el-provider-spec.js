@@ -170,7 +170,7 @@ describe('JSP autocompletions', () => {
         editor.buffer.append(text);
         editor.setCursorBufferPosition([1, text.length - 1]);
 
-        waitsFor(() => varInReg('fooBarBaz'), 1200);
+        waitsFor(() => varInReg('fooBarBaz'), 3000);
 
         runs(() => {
             const completion = getCompletion('fooBarBaz', true);
@@ -194,7 +194,7 @@ describe('JSP autocompletions', () => {
         editor.buffer.append(text);
         editor.setCursorBufferPosition([1, text.length - 1]);
 
-        waitsFor(() => varInReg('myMap'), 1200);
+        waitsFor(() => varInReg('myMap'), 3000);
 
         runs(() => {
             const completion = getCompletion('myMap', true);
