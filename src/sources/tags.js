@@ -4,7 +4,7 @@ import * as registry from '../registry';
 import {VarDesc} from '../desc-classes';
 import {extractAttributes} from '../utils';
 
-const varRegExp = /<[a-zA-Z][a-zA-Z0-3_]*:[a-zA-Z][a-zA-Z0-3_]+\s+[^>]*var="([^"]*)"[^>]*>/g;
+const varRegExp = /<[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+\s+[^>]*var="([^"]*)"[^>]*>/g;
 const useBeanRegExp = /<jsp:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:class|id)="[^"]*"\s*)[^>]*\/?>/g;
 
 /**
