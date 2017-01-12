@@ -1,10 +1,15 @@
 'use babel';
 
-let registry = new Map();
-let refreshHandlers = [];
+let cache = new WeakMap();
+
+const registry = new Map();
+const refreshHandlers = [];
+
+function cleanCache() {
+    cache = new WeakMap();
+}
 
 class RegistryEntry {
-
     constructor({element, refresh, liveTime=Infinity}) {
         this.element = element;
         this.liveTime = liveTime;
@@ -42,6 +47,7 @@ class RegistryEntry {
         const wasInRegistry = registry.delete(this.id);
         if (wasInRegistry) {
             this.id = null;
+            cleanCache();
         } else {
             throw new Error('This entry is not part of the registry');
         }
@@ -69,6 +75,43 @@ export function add(options) {
     const id = Symbol();
     entry.id = id;
     registry.set(id, entry);
+    cleanCache();
+}
+
+function applyFilters(filter, element) {
+    function* applyRule(rule) {
+        const prop = element[rule.name];
+
+        if (rule.type) {
+            yield typeof prop === rule.type;
+        }
+
+        if (rule.value) {
+            yield rule.value === prop;
+        } else if (rule.values) {
+            yield rule.values.includes(prop);
+        }
+    }
+
+    for (const rule of filter) {
+        for (const step of applyRule(rule)) {
+            if ((rule.negate && step) || !step) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+function registryEntries() {
+    if (cache.registryEntries) {
+        return cache.registryEntries;
+    }
+
+    const entries = [];
+    registry.forEach(entry => entries.push(entry));
+    cache.registryEntries = entries;
+    return entries;
 }
 
 export function getAll({type, filter=[]}={}, doRefresh=true) {
@@ -76,31 +119,22 @@ export function getAll({type, filter=[]}={}, doRefresh=true) {
         refresh();
     }
 
-    let all = [];
+    let all = registryEntries().map(entry => entry.get());
 
-    registry.forEach(entry => {
-        const element = entry.get();
-
-        if (type && !(element instanceof type)) {
-            return;
+    if (type) {
+        if (!cache.byType) {
+            cache.byType = new WeakMap();
         }
 
-        for (let attr of filter) {
-            if (attr.value) {
-                if (element[attr.name] !== attr.value) {
-                    return;
-                }
-            } else if (attr.values) {
-                if (!attr.values.includes(element[attr.name])) {
-                    return;
-                }
-            }
+         if (cache.byType[type]) {
+            all = cache.byType[type];
+        } else {
+            all = all.filter(element => element instanceof type);
+            cache.byType[type] = all;
         }
+    }
 
-        if (element) {
-            all.push(element);
-        }
-    });
+    all = all.filter(element => applyFilters(filter, element));
 
     return all;
 }

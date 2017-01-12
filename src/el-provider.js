@@ -2,28 +2,9 @@
 
 import match from 'match-like';
 
-import {oneTrue, extractAttributes} from './utils';
+import {getUsedTaglibs} from './get-used-taglibs';
 import {getAll as getRegistryElements} from './registry';
-import {TagFunctionDesc, VarDesc, KeywordDesc, TaglibDesc} from './desc-classes';
-
-const useTaglibRegExp = new RegExp(
-    '<%@\\s+taglib\\s+' +
-    '((?:prefix|uri)="[^"]*")\\s+' +
-    '((?:prefix|uri)="[^"]*")\\s*',
-    'g'
-);
-
-const useTaglibXmlRegExp = new RegExp(
-    '<jsp:directive.taglib\\s+' +
-    '((?:prefix|uri)="[^"]*")\\s+' +
-    '((?:prefix|uri)="[^"]*")\\s*',
-    'g'
-);
-
-const useTaglibNsRegExp = new RegExp(
-    'xmlns:([^=]+)="([^"]+)"',
-    'g'
-);
+import {TagFunctionDesc, VarDesc, KeywordDesc} from './desc-classes';
 
 /**
  * Context of the completion
@@ -45,37 +26,6 @@ const contextTests = [{
     tester: () => true,
     type: Context.NONE,
 }];
-
-/**
- * Get the loaded tlds
- * @param   {string} text relevant editor content
- * @returns {Array}
- */
-function getUsedTaglibs(text) {
-    const uris = {};
-
-    [useTaglibRegExp, useTaglibXmlRegExp].forEach(regExp => {
-        text.replace(regExp, matchText => {
-            const attributes = extractAttributes(matchText, ['prefix', 'uri']);
-            uris[attributes.uri] = attributes.prefix;
-        });
-    });
-
-    text.replace(useTaglibNsRegExp, (matchText, ns, uri) => {
-        uris[uri] = ns;
-    });
-
-    return getRegistryElements({
-        type: TaglibDesc,
-        filter: [{
-            name: 'uri',
-            values: Object.keys(uris),
-        }],
-    }, false).map(desc => ({
-        prefix: uris[desc.uri],
-        desc,
-    }));
-}
 
 /**
  * detects the context of the completion
@@ -122,6 +72,9 @@ function getExpressionInfo(editor, bufferPosition) {
     const scope = '.el_expression';
     const tb = editor.tokenizedBuffer;
     const range = tb.bufferRangeForScopeAtPosition(scope, bufferPosition);
+    if (!range) {
+        throw Error(`The bufferPosition (${bufferPosition}) has no expression scope`);
+    }
     const expression = cutOffExpressionMarks(editor.getTextInRange(range));
     const preCursorRange = {
         start: range.start,
@@ -137,8 +90,8 @@ function getExpressionInfo(editor, bufferPosition) {
 }
 
 export default {
-    selector: '.text.html.jsp .el_expression',
-    disableForSelector: '.el_expression .string',
+    selector: '.text.html.jsp .el_expression.jsp',
+    disableForSelector: '.el_expression.jsp .string, .el_expression.jsp > .begin',
     /*
      * More than autocomplete-java-minus, because in the language-java repo,
      * .el_expressions are still considered .source.java.
@@ -170,7 +123,7 @@ export default {
         const validTypes = getTypesForContext(context);
 
         return getRegistryElements()
-            .filter(desc => oneTrue(validTypes, cons => desc instanceof cons))
+            .filter(desc => validTypes.some(cons => desc instanceof cons))
             .filter(desc => desc.filter({prefix, usedTaglibs}))
             .map(desc => desc.suggestion({replacementPrefix, usedTaglibs}));
     },

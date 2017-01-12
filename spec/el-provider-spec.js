@@ -58,9 +58,9 @@ describe('JSP autocompletions', () => {
 
         runs(() => {
             const pkg = atom.packages.getActivePackage('autocomplete-jsp');
-            pgkPath = atom.packages.loadPackage('autocomplete-jsp').path;
+            pgkPath = pkg.path;
 
-            const selector = '.text.html.jsp .el_expression';
+            const selector = '.text.html.jsp .el_expression.jsp';
             const providers = pkg.mainModule.getProviders();
             provider = providers.filter(p => p.selector === selector)[0];
 
@@ -252,7 +252,9 @@ describe('JSP autocompletions', () => {
         loadTestTld();
 
         editor.setText('');
-        editor.buffer.append('<jsp:directive.taglib uri="http://example.com/jsp/test" prefix="prefixOfTag" />\n');
+        editor.buffer.append('<jsp:directive.taglib ' +
+            'uri="http://example.com/jsp/test" ' +
+            'prefix="prefixOfTag" />\n');
         editor.buffer.append('\n');
         const text = '${prefixOfTag:}';
         editor.buffer.append(text);

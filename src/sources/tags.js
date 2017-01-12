@@ -4,14 +4,14 @@ import * as registry from '../registry';
 import {VarDesc} from '../desc-classes';
 import {extractAttributes} from '../utils';
 
-const varRegExp = /<[a-zA-Z][a-zA-Z0-3_]*:[a-zA-Z][a-zA-Z0-3_]+\s+[^>]*var="([^"]*)"[^>]*>/g;
+const varRegExp = /<[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+\s+[^>]*var="([^"]*)"[^>]*>/g;
 const useBeanRegExp = /<jsp:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:class|id)="[^"]*"\s*)[^>]*\/?>/g;
 
 /**
  * The live time of the detected elements i.e. the refresh rate
  * @type {number}
  */
-const liveTime = 800;
+const liveTime = 2000;
 
 let version = 0;
 let lastChanged = Date.now();
@@ -58,7 +58,7 @@ export function register() {
         });
 
         editorText.replace(useBeanRegExp, (matchText) => {
-            const attributes = extractAttributes(matchText, ['id', 'class']);
+            const attributes = extractAttributes(matchText);
 
             const idValue = attributes.id;
             const classValue = attributes.class;

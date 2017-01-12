@@ -1,22 +1,6 @@
 'use babel';
 
 /**
- * Test whether a given function returns true for any of the supplied values
- *
- * @param   {Array}   values
- * @param   {Funtion} testFn
- * @returns {boolean}
- */
-export function oneTrue(values, testFn) {
-    for (let i = 0; i < values.length; i += 1) {
-        if (testFn(values[i])) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
  * Tries to get a property from nested objects, but stops if
  * any property on the path isn't an object.
  *
@@ -40,7 +24,7 @@ export function getDeepPropSave(obj, ...path) {
 }
 
 
-export const attrRegExp = (function() {
+export const attrRegExp = (() => {
     let cache = {};
 
     return function attrRegExp(name) {
@@ -57,21 +41,18 @@ export const attrRegExp = (function() {
 /**
  * Finds all attributes in a XML tag like text
  *
- * @param   {string} text
- * @param   {string} attributesNames
- * @returns {Object} an object with that maps the attribute names to there values
+ * @param   {string}   text
+ * @param   {string[]} attributesNames
+ * @returns {Object} an object which that maps the attribute names to there values
  */
-export function extractAttributes(text, attributesNames) {
+export function extractAttributes(text) {
     const attributes = {};
-
-    attributesNames.forEach(name => {
-        const res = text.match(attrRegExp(name));
-        if (res && res[1]) {
-            attributes[name] = res[1];
-        } else {
-            attributes[name] = undefined;
-        }
-    });
-
+    const attrMatch = text.match(/[a-zA-Z0-9_\-]+="[^"]*"/g);
+    if (attrMatch) {
+        attrMatch.forEach(attrStr => {
+            const [, name, value] = attrStr.match(/([a-zA-Z0-9_\-]+)="([^"]*)"/);
+            attributes[name] = value;
+        });
+    }
     return attributes;
 }

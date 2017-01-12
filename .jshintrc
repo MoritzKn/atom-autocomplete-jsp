@@ -30,11 +30,11 @@
 
     "strict"        : false,    // true: Requires all functions run in ES5 Strict Mode
     "maxparams"     : 3,        // {int} Max number of formal params allowed per function
-    "maxdepth"      : 5,        // {int} Max depth of nested blocks (within functions)
+    "maxdepth"      : 3,        // {int} Max depth of nested blocks (within functions)
     "maxstatements" : false,    // {int} Max number statements per function
-    "maxcomplexity" : 10,       // {int} Max cyclomatic complexity per function
-    "maxlen"        : false,    // {int} Max number of characters per line
-    "varstmt"       : false,    // true: Disallow any var statements. Only `let` and `const` are allowed.
+    "maxcomplexity" : 8,        // {int} Max cyclomatic complexity per function
+    "maxlen"        : 110,      // {int} Max number of characters per line
+    "varstmt"       : true,     // true: Disallow any var statements. Only `let` and `const` are allowed.
 
     // Relaxing
     "asi"           : false,    // true: Tolerate Automatic Semicolon Insertion (no semicolons)
@@ -52,7 +52,7 @@
     "lastsemic"     : false,    // true: Tolerate omitting a semicolon for the last statement of a 1-line block
     "laxbreak"      : false,    // true: Tolerate possibly unsafe line breakings
     "laxcomma"      : false,    // true: Tolerate comma-first style coding
-    "loopfunc"      : false,    // true: Tolerate functions being defined in loops
+    "loopfunc"      : true,     // true: Tolerate functions being defined in loops
     "multistr"      : false,    // true: Tolerate multi-line strings
     "noyield"       : false,    // true: Tolerate generator functions with no yield statement in them.
     "notypeof"      : false,    // true: Tolerate invalid typeof operator values

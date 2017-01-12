@@ -161,6 +161,7 @@ export function register() {
     const tldSourceDirs = atom.config.get('autocomplete-jsp.tldSources')
             .map(path => fs.normalize(path));
 
+    // TODO: refresh when files change
     Promise.all(tldSourceDirs.map(readdirProm))
         .then(result => [].concat.apply([], result))
         .then(paths => paths.filter(path => path.endsWith('.tld')))
