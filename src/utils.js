@@ -41,9 +41,9 @@ export const attrRegExp = (() => {
 /**
  * Finds all attributes in a XML tag like text
  *
- * @param   {string} text
- * @param   {string} attributesNames
- * @returns {Object} an object with that maps the attribute names to there values
+ * @param   {string}   text
+ * @param   {string[]} attributesNames
+ * @returns {Object} an object which that maps the attribute names to there values
  */
 export function extractAttributes(text) {
     const attributes = {};
