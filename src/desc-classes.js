@@ -105,14 +105,14 @@ export class TagFunctionDesc extends GenericDesc {
     }
 
     getSnippet(ns) {
-       const name = this.name;
-       const args = this.argumentTypes;
-       const argsStr = args
-           .map((type, i) => `\${${i+1}:${toShortType(type)}}`)
-           .join(', ');
+        const name = this.name;
+        const args = this.argumentTypes;
+        const argsStr = args
+            .map((type, i) => `\${${i+1}:${toShortType(type)}}`)
+            .join(', ');
 
-       return `${ns}:${name}(${argsStr})`;
-   }
+        return `${ns}:${name}(${argsStr})`;
+    }
 
     filter({prefix, usedTaglibs}) {
         let ns;
