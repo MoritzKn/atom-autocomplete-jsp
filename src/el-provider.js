@@ -2,28 +2,9 @@
 
 import match from 'match-like';
 
-import {oneTrue, extractAttributes} from './utils';
+import {getUsedTaglibs} from './get-used-taglibs';
 import {getAll as getRegistryElements} from './registry';
-import {TagFunctionDesc, VarDesc, KeywordDesc, TaglibDesc} from './desc-classes';
-
-const useTaglibRegExp = new RegExp(
-    '<%@\\s+taglib\\s+' +
-    '((?:prefix|uri)="[^"]*")\\s+' +
-    '((?:prefix|uri)="[^"]*")\\s*',
-    'g'
-);
-
-const useTaglibXmlRegExp = new RegExp(
-    '<jsp:directive.taglib\\s+' +
-    '((?:prefix|uri)="[^"]*")\\s+' +
-    '((?:prefix|uri)="[^"]*")\\s*',
-    'g'
-);
-
-const useTaglibNsRegExp = new RegExp(
-    'xmlns:([^=]+)="([^"]+)"',
-    'g'
-);
+import {TagFunctionDesc, VarDesc, KeywordDesc} from './desc-classes';
 
 /**
  * Context of the completion
@@ -45,37 +26,6 @@ const contextTests = [{
     tester: () => true,
     type: Context.NONE,
 }];
-
-/**
- * Get the loaded tlds
- * @param   {string} text relevant editor content
- * @returns {Array}
- */
-function getUsedTaglibs(text) {
-    const uris = {};
-
-    [useTaglibRegExp, useTaglibXmlRegExp].forEach(regExp => {
-        text.replace(regExp, matchText => {
-            const attributes = extractAttributes(matchText, ['prefix', 'uri']);
-            uris[attributes.uri] = attributes.prefix;
-        });
-    });
-
-    text.replace(useTaglibNsRegExp, (matchText, ns, uri) => {
-        uris[uri] = ns;
-    });
-
-    return getRegistryElements({
-        type: TaglibDesc,
-        filter: [{
-            name: 'uri',
-            values: Object.keys(uris),
-        }],
-    }, false).map(desc => ({
-        prefix: uris[desc.uri],
-        desc,
-    }));
-}
 
 /**
  * detects the context of the completion
