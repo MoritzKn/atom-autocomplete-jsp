@@ -140,8 +140,8 @@ function getExpressionInfo(editor, bufferPosition) {
 }
 
 export default {
-    selector: '.text.html.jsp .el_expression',
-    disableForSelector: '.el_expression .string',
+    selector: '.text.html.jsp .el_expression.jsp',
+    disableForSelector: '.el_expression.jsp .string, .el_expression.jsp > .begin',
     /*
      * More than autocomplete-java-minus, because in the language-java repo,
      * .el_expressions are still considered .source.java.
