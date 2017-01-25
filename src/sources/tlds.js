@@ -38,7 +38,17 @@ function parseMethodSignature(signature) {
 }
 
 function parseBool(str) {
-    return str !== 'false';
+    if (typeof str === 'string') {
+        str = str.trim();
+
+        if (str === 'true') {
+            return true;
+        } else if (str === 'false') {
+            return false;
+        }
+    }
+
+    return !!str;
 }
 
 function taglibToDesc(taglib) {
