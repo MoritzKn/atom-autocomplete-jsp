@@ -145,7 +145,7 @@ function readInTld(path) {
     });
 }
 
-function readdirProm(path) {
+function readDir(path) {
     path = path.replace(/[/\\]$/, '');
     return new Promise((resolve, reject) =>
         fs.readdir(path, (err, fileNames) => {
@@ -179,7 +179,7 @@ export function register() {
             .map(path => fs.normalize(path));
 
     // TODO: refresh when files change
-    Promise.all(tldSourceDirs.map(readdirProm))
+    Promise.all(tldSourceDirs.map(readDir))
         .then(result => [].concat.apply([], result))
         .then(paths => paths.filter(path => path.endsWith('.tld')))
         .then(paths => readAndRegisterTlds(paths))
