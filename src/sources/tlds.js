@@ -123,7 +123,7 @@ function readInTld(path) {
                 });
             }
 
-            xml2js.parseString(content, (err, {taglib}) => {
+            xml2js.parseString(content, (err, doc) => {
                 if (err) {
                     return reject({
                         msg: `Parsing XML in '${path}' failed`,
@@ -131,7 +131,14 @@ function readInTld(path) {
                     });
                 }
 
-                const taglibDesc = taglibToDesc(taglib);
+                if (typeof doc.taglib === 'undefined') {
+                    return reject({
+                        msg: `Parsing XML in '${path}' failed`,
+                        causedBy: new Error(),
+                    });
+                }
+
+                const taglibDesc = taglibToDesc(doc.taglib);
                 return resolve(taglibDesc);
             });
         });
@@ -176,10 +183,11 @@ export function register() {
         .then(result => [].concat.apply([], result))
         .then(paths => paths.filter(path => path.endsWith('.tld')))
         .then(paths => readAndRegisterTlds(paths))
-        .catch(err =>
+        .catch(err => {
+            const detail = err.causedBy ? `Caused by:\n${err.causedBy}` : '';
             atom.notifications.addWarning(`Autocomplete-JSP: ${err.msg}`, {
                 dismissable: true,
-                detail: `Caused by:\n${err.causedBy}`,
-            })
-        );
+                detail,
+            });
+        });
 }
