@@ -5,36 +5,21 @@ import {extractAttributes} from './utils';
 import {TagDesc, VarDesc} from './desc-classes';
 import {getAll as getRegistryElements} from './registry';
 
-function hasStringScope(scopes) {
-    const stringScopes = [
-        'string.quoted.double.html',
-        'string.quoted.single.html'
-    ];
-
-    return stringScopes.some(stringScope => scopes.includes(stringScope));
-}
-
-function hasTagScope(scopes) {
-    return scopes.some(scope => scope.includes('meta.tag'));
+function includesScope(scopes, scope) {
+    return scopes.some(s => s.includes(scope));
 }
 
 function isAttributeValue({prefix, scopes}) {
     const lastPrefixCharacter = prefix[prefix.length - 1];
-    if (['"', '\''].includes(lastPrefixCharacter)) {
-        return false;
-    }
-    return hasStringScope(scopes) && hasTagScope(scopes);
+    return lastPrefixCharacter !== '"' &&
+           includesScope(scopes, 'string.quoted') &&
+           includesScope(scopes, 'meta.tag');
 }
 
 function isAttribute({prefix, scopes, preText}) {
-    if (!hasTagScope(scopes)) {
-        return false;
-    }
-    if (scopes.some(scope => scope.includes('entity.name.tag'))) {
-        return false;
-    }
-
-    return /\s[a-zA-Z0-9_\-]*$/.test(preText);
+    return includesScope(scopes, 'meta.tag') && 
+           includesScope(scopes, 'entity.name.tag') &&
+           /\s[a-zA-Z0-9_\-]*$/.test(preText);
 }
 
 function isTagStart({prefix, scopes}) {
@@ -46,7 +31,7 @@ function isTagStart({prefix, scopes}) {
             }
         }
     } else if (prefix) {
-        return hasTagScope(scopes);
+        return includesScope(scopes, 'meta.tag');
     }
     return false;
 }
