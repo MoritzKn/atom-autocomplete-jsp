@@ -3,7 +3,7 @@
 
 This [Atom](https://atom.io) package adds autocompletion support for JSP with focus on it's subset JSPX.  Uses the [autocomplete-plus](https://github.com/atom-community/autocomplete-plus) package.
 
-See [setup][setup] and [changelog][changelog]
+See [setup][setup] and [changelog][changelog].
 
 ## Features
 ### Autocompletion for implicit objects
@@ -76,3 +76,7 @@ cp ~/workspace/*/src/**.tld ~/tlds/
 [screenshot-tags-use-bean]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tags-use-bean.png
 [screenshot-tag-functions]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tag-functions.png
 [screenshot-abbreviations]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-abbreviations.png
+
+## License
+This project is licensed under the terms of the MIT license. A copy of the license can be found 
+in the root directory of the project in the file [LICENSE.md](./LICENSE.md).
