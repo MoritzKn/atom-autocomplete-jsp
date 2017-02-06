@@ -259,10 +259,6 @@ export class TagDesc extends GenericDesc {
             replacementPrefix,
         };
     }
-
-    toString() {
-        return this.name;
-    }
 }
 
 export class TagAttrDesc extends GenericDesc {
