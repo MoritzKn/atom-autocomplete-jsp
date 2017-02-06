@@ -17,8 +17,7 @@ function isAttributeValue({prefix, scopes}) {
 }
 
 function isAttribute({prefix, scopes, preText}) {
-    return includesScope(scopes, 'meta.tag') && 
-           includesScope(scopes, 'entity.name.tag') &&
+    return includesScope(scopes, 'meta.tag') &&
            /\s[a-zA-Z0-9_\-]*$/.test(preText);
 }
 
