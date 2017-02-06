@@ -36,27 +36,6 @@ export function register() {
             }
         };
 
-        // Use replace because it's the only way to get all matches and all groups
-        editorText.replace(varRegExp, (matchText, name) => {
-            const otherRefs = registry.getAll({
-                type: VarDesc,
-                filter: [{
-                    name: 'name',
-                    value: name,
-                }],
-            }, false);
-
-            if (otherRefs.length > 0) {
-                return;
-            }
-
-            registry.add({
-                element: new VarDesc({ name }),
-                refresh: refreshHandler,
-                liveTime,
-            });
-        });
-
         editorText.replace(useBeanRegExp, (matchText) => {
             const attributes = extractAttributes(matchText);
 
@@ -81,6 +60,27 @@ export function register() {
                     name: idValue
                 }),
                 refresh: refreshHandler,
+            });
+        });
+
+        // Use replace because it's the only way to get all matches and all groups
+        editorText.replace(varRegExp, (matchText, name) => {
+            const otherRefs = registry.getAll({
+                type: VarDesc,
+                filter: [{
+                    name: 'name',
+                    value: name,
+                }],
+            }, false);
+
+            if (otherRefs.length > 0) {
+                return;
+            }
+
+            registry.add({
+                element: new VarDesc({ name }),
+                refresh: refreshHandler,
+                liveTime,
             });
         });
 
