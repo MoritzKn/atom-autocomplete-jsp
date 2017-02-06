@@ -296,19 +296,22 @@ export class TagAttrDesc extends GenericDesc {
         return `${this.name}="${value}"`;
     }
 
-    suggestion({replacementPrefix}) {
+    suggestion({replacementPrefix, namespace}) {
         const infos = [
             !this.rtexprvalue ? 'static' : null,
             this.shortType,
             this.required ? 'required' : null,
         ];
 
+        const tagNamePrefix = namespace ? namespace + ':' : '';
+
         return {
             snippet: this.snippet,
             displayText: this.name,
             description: this.description,
             type: 'attribute',
-            rightLabel: infos.filter(el => !!el).join(', '),
+            rightLabel: '<' + tagNamePrefix + this.tag.name + '>',
+            leftLabel: infos.filter(el => !!el).join(', '),
             replacementPrefix,
         };
     }

@@ -110,7 +110,7 @@ function getAttributeSuggestions(request) {
     return tagDesc.attributes
         .filter(desc => !usedAttributes.includes(desc.name))
         .filter(desc => desc.filter({prefix}))
-        .map(desc => desc.suggestion({replacementPrefix}));
+        .map(desc => desc.suggestion({replacementPrefix, namespace}));
 }
 
 function getTagSuggestions(request) {
