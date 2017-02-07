@@ -21,7 +21,7 @@ function isAttribute({prefix, scopes, preText}) {
            /\s[a-zA-Z0-9_\-]*$/.test(preText);
 }
 
-function isTagStart({prefix, scopes}) {
+function isTag({prefix, scopes}) {
     if (prefix === '<') {
         if (scopes.length >= 1 && scopes[0] === 'text.html.jsp') {
             switch (scopes.length) {
@@ -173,7 +173,7 @@ export default {
             return getAttributeValueSuggestions(request);
         } else if (isAttribute(request)) {
             return getAttributeSuggestions(request);
-        } else if (isTagStart(request)) {
+        } else if (isTag(request)) {
             return getTagSuggestions(request);
         } else {
             return [];
