@@ -365,3 +365,24 @@ export class KeywordDesc extends GenericDesc {
         };
     }
 }
+
+export class ScopeDesc extends GenericDesc {
+    /**
+     * @param {object} initData
+     * @param {string} initData.name
+     * @param {string} [initData.description]
+     */
+    constructor(initData) {
+        super(initData.name);
+        this.description = (initData.description || '').trim();
+    }
+
+    suggestion({replacementPrefix}) {
+        return {
+            text: this.name,
+            description: this.description,
+            type: 'namespace',
+            replacementPrefix,
+        };
+    }
+}

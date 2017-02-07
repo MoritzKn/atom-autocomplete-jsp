@@ -2,7 +2,7 @@
 
 import {getUsedTaglibs} from './get-used-taglibs';
 import {extractAttributes} from './utils';
-import {TagDesc, VarDesc} from './desc-classes';
+import {TagDesc, VarDesc, ScopeDesc} from './desc-classes';
 import {getAll as getRegistryElements} from './registry';
 
 function includesScope(scopes, scope) {
@@ -43,8 +43,9 @@ function getAttributeValueSuggestions(request) {
         return [];
     }
 
-    const tagName = attrMatch[1];
-    if (!['var', 'varStatus'].includes(tagName)) {
+    const attrName = attrMatch[1];
+
+    if (!['var', 'varStatus', 'scope'].includes(attrName)) {
         return [];
     }
 
@@ -58,11 +59,19 @@ function getAttributeValueSuggestions(request) {
     }
 
     const prefix = replacementPrefix.toLowerCase();
-    return getRegistryElements({type: VarDesc})
-        .filter(desc => desc.name !== replacementPrefix || desc.type)
-        .filter(desc => desc.filter({prefix}))
-        .map(desc => desc.suggestion({replacementPrefix}));
+
+    if (['var', 'varStatus'].includes(attrName)) {
+        return getRegistryElements({type: VarDesc})
+            .filter(desc => desc.name !== replacementPrefix || desc.type)
+            .filter(desc => desc.filter({prefix}))
+            .map(desc => desc.suggestion({replacementPrefix}));
+    } else if (attrName === 'scope') {
+        return getRegistryElements({type: ScopeDesc})
+            .filter(desc => desc.filter({prefix}))
+            .map(desc => desc.suggestion({replacementPrefix}));
+    }
 }
+
 
 function getAttributeSuggestions(request) {
     const {editor, bufferPosition, preText, activatedManually} = request;

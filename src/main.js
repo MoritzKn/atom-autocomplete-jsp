@@ -5,6 +5,7 @@ import tagProvider from './tag-provider';
 
 import {register as registerIo} from './sources/implicit-object';
 import {register as registerKw} from './sources/keywords';
+import {register as registerScopes} from './sources/scopes';
 import {register as registerTags} from './sources/tags';
 import {register as registerTlds} from './sources/tlds';
 
@@ -13,6 +14,7 @@ export function activate() {
     registerKw();
     registerTlds();
     registerTags();
+    registerScopes();
 }
 
 export function getProviders() {
