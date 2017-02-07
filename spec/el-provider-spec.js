@@ -145,7 +145,7 @@ describe('JSP autocompletions EL provider', () => {
             expect(completion).toBeDefined();
         });
 
-        it(`it supports abbreviations'`, () => {
+        it(`supports abbreviations'`, () => {
             setContent('${foo ip', '}');
             const completion = getCompletion('initParam', true);
 
