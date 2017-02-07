@@ -33,8 +33,7 @@ const contextTests = [{
  * @returns {Context}
  */
 function getcompletionContext(preCursor) {
-    return contextTests.filter(type => type.tester(preCursor))
-                       .map(type => type.type)[0];
+    return contextTests.find(test => test.tester(preCursor)).type;
 }
 
 /**

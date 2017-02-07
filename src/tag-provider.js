@@ -103,7 +103,7 @@ function getAttributeSuggestions(request) {
         return [];
     }
 
-    const tagDesc = taglibDesc.tags.filter(tagDesc => tagDesc.name === tagName)[0];
+    const tagDesc = taglibDesc.tags.find(tagDesc => tagDesc.name === tagName);
 
     if (!tagDesc) {
         return [];
