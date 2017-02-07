@@ -1,86 +1,56 @@
 // jshint jasmine: true
 /* globals waitsForPromise */
 
+const utils = require('./spec-utils');
+const {importTaglibStr, getProvider} = utils;
+
 describe('JSP autocompletions EL provider', () => {
-    let editor;
-    let provider;
-    let pgkPath;
-
+    // Dependencies
     let VarDesc;
-    let registry;
     let sourceTlds;
+    let registry;
 
-    function getCompletions(activatedManually=false) {
-        const cursor = editor.getLastCursor();
-        const start = cursor.getBeginningOfCurrentWordBufferPosition();
-        const end = cursor.getBufferPosition();
-        const prefix = editor.getTextInRange([start, end]);
-        const scopeDescriptor = cursor.getScopeDescriptor();
+    // State
+    let editor;
+    let pkg;
+    let provider;
 
-        return provider.getSuggestions({
-            bufferPosition: end,
-            editor,
-            prefix,
-            scopeDescriptor,
-            activatedManually,
-        });
-    }
-
-    function getCompletion(filter, activatedManually=false) {
-        const completions = getCompletions(activatedManually);
-
-        const matchingCompletions = completions
-            .filter(comp => (comp.text || comp.snippet).includes(filter));
-
-        return matchingCompletions[0];
-    }
-
-    function loadTestTld() {
-        const testTld = `${pgkPath}/spec/fixtures/tlds/test.tld`;
-
-        waitsForPromise(() =>
-            sourceTlds.readAndRegisterTlds([testTld]));
-    }
-
-    function varInReg(varName) {
-        return registry.getAll({
-            type: VarDesc,
-            filter: [{
-                name: 'name',
-                value: varName,
-            }],
-        }).length > 0;
-    }
-
-    function setContent(pre, after='') {
-        const text = pre + after;
-        editor.setText(text);
-        const lines = text.split(/\n/);
-        editor.setCursorBufferPosition([lines.length - 1, lines[lines.length - 1].length]);
-    }
+    // Utils functions
+    let getCompletion;
+    let getCompletions;
+    let loadTestTld;
+    let setContent;
+    let varInRegistry;
 
     beforeEach(() => {
         waitsForPromise(() => atom.packages.activatePackage('autocomplete-jsp'));
         waitsForPromise(() => atom.packages.activatePackage('language-java'));
+        waitsForPromise(() => atom.workspace.open('test.jsp'));
 
         runs(() => {
-            const pkg = atom.packages.getActivePackage('autocomplete-jsp');
-            pgkPath = pkg.path;
+            editor = atom.workspace.getActiveTextEditor();
+            pkg = atom.packages.getActivePackage('autocomplete-jsp');
+            provider = getProvider(pkg, '.text.html.jsp .el_expression.jsp');
 
-            const selector = '.text.html.jsp .el_expression.jsp';
-            const providers = pkg.mainModule.getProviders();
-            provider = providers.filter(p => p.selector === selector)[0];
+            VarDesc = require(`${pkg.path}/src/desc-classes`).VarDesc;
+            registry = require(`${pkg.path}/src/registry`);
+            sourceTlds = require(`${pkg.path}/src/sources/tlds`);
 
-            VarDesc = require(`${pgkPath}/src/desc-classes`).VarDesc;
-            registry = require(`${pgkPath}/src/registry`);
-            sourceTlds = require(`${pgkPath}/src/sources/tlds`);
+            const functions = utils.mkUtilFunctions({
+                editor,
+                pkg,
+                provider,
+                VarDesc,
+                sourceTlds,
+                registry,
+            });
+
+            getCompletion = functions.getCompletion;
+            getCompletions = functions.getCompletions;
+            loadTestTld = functions.loadTestTld;
+            setContent = functions.setContent;
+            varInRegistry = functions.varInRegistry;
         });
-
-        waitsForPromise(() => atom.workspace.open('test.jsp'));
-        runs(() => editor = atom.workspace.getActiveTextEditor());
-
-        atom.config.set('autocomplete-jsp.tldSources', []);
-        atom.config.set('autocomplete-plus.minimumWordLength', 3);
     });
 
     it('returns no completions inside empty expressions', () => {
@@ -89,13 +59,6 @@ describe('JSP autocompletions EL provider', () => {
 
         expect(Array.isArray(completions)).toBe(true);
         expect(completions.length).toBe(0);
-    });
-
-    it('returns completions inside empty expressions when activated manually', () => {
-        setContent('${a', '}');
-        const completions = getCompletions(true);
-
-        expect(completions.length).toBeGreaterThan(0);
     });
 
     describe('completions for keyword', () => {
@@ -193,7 +156,7 @@ describe('JSP autocompletions EL provider', () => {
     describe('completions for variables defined in tags', () => {
         it('returns completions for variables defined in `<c:set>` tags', () => {
             setContent('<c:set var="fooBarBaz">\n${fooBa', '}');
-            waitsFor(() => varInReg('fooBarBaz'), 3000);
+            waitsFor(() => varInRegistry('fooBarBaz'), 3000);
             runs(() => {
                 const completion = getCompletion('fooBarBaz');
 
@@ -209,7 +172,7 @@ describe('JSP autocompletions EL provider', () => {
 
         it('returns completions for variables defined in `<jsp:useBean>`', () => {
             setContent('<jsp:useBean id="myMap" class="java.utils.HashMap">\n${myMa', '}');
-            waitsFor(() => varInReg('myMap'), 3000);
+            waitsFor(() => varInRegistry('myMap'), 3000);
             runs(() => {
                 const completion = getCompletion('myMap');
 
@@ -225,21 +188,20 @@ describe('JSP autocompletions EL provider', () => {
     });
 
     describe('taglibs handling', () => {
-        const importTaglibStr = '<%@ taglib\nuri="http://example.com/jsp/test" prefix="prefixOfTag" %>\n';
-
         it('returns no completions from not imported taglibs', () => {
-            loadTestTld();
+            waitsForPromise(() => loadTestTld());
             runs(() => {
                 setContent('${ts:', '}');
                 const completions = getCompletions();
 
+                expect(Array.isArray(completions)).toBe(true);
                 expect(completions.length).toBe(0);
             });
         });
 
         describe('taglibs imports', () => {
             it('returns completions from taglibs imported by taglib directives', () => {
-                loadTestTld();
+                waitsForPromise(() => loadTestTld());
                 runs(() => {
                     const text =  '<%@ taglib\n' +
                         'uri="http://example.com/jsp/test" prefix="prefixOfTag" %>\n' +
@@ -250,7 +212,7 @@ describe('JSP autocompletions EL provider', () => {
             });
 
             it('returns completions from taglibs imported by XML taglib directives', () => {
-                loadTestTld();
+                waitsForPromise(() => loadTestTld());
                 runs(() => {
                     const text = '<jsp:directive.taglib\n' +
                         'uri="http://example.com/jsp/test" prefix="prefixOfTag"/>\n' +
@@ -261,7 +223,7 @@ describe('JSP autocompletions EL provider', () => {
             });
 
             it('returns completions from taglibs imported by XML namespace attributes', () => {
-                loadTestTld();
+                waitsForPromise(() => loadTestTld());
                 runs(() => {
                     const text = '<someTag xmlns:prefixOfTag="http://example.com/jsp/test"/>\n' +
                         '${prefixOfTag:';
@@ -296,11 +258,11 @@ describe('JSP autocompletions EL provider', () => {
                 setContent(importTaglibStr + '${prefixOfTag:con', '}');
                 expect(getCompletion('prefixOfTag:concat').replacementPrefix).toBe('prefixOfTag:con');
 
-                setContent(importTaglibStr + '${test:foo(prefixOfTag:con', ')}');
-                expect(getCompletion('prefixOfTag:concat').replacementPrefix).toBe('prefixOfTag:con');
-
-                setContent(importTaglibStr + '${prefix}');
+                setContent(importTaglibStr + '${prefix', '}');
                 expect(getCompletion('prefixOfTag:concat').replacementPrefix).toBe('prefix');
+
+                setContent(importTaglibStr + '${fn:startsWith(prefixOfTag:con', ')}');
+                expect(getCompletion('prefixOfTag:concat').replacementPrefix).toBe('prefixOfTag:con');
             });
         });
     });
