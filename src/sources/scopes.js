@@ -6,19 +6,15 @@ import {ScopeDesc} from '../desc-classes';
 const scopes = [
     new ScopeDesc({
         name: 'application',
-        description: ''
     }),
     new ScopeDesc({
         name: 'page',
-        description: ''
     }),
     new ScopeDesc({
         name: 'request',
-        description: ''
     }),
     new ScopeDesc({
         name: 'session',
-        description: ''
     }),
 ];
 
