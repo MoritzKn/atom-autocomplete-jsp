@@ -170,7 +170,7 @@ describe('JSP autocompletions tag provider', () => {
 
         it('shows the correct information', () => {
             setContent(importTaglibStr + '<prefixOfTag:forEach ite');
-            const completion = getCompletion('ite');
+            const completion = getCompletion('items');
 
             expect(completion).toBeDefined();
             expect(completion.snippet).toContain('items');
@@ -231,6 +231,79 @@ describe('JSP autocompletions tag provider', () => {
     });
 
     describe('attribute value completion', () => {
-        // TODO:
+        describe('var attribute', () => {
+            it('returns no completions in empty attribute', () => {
+                setContent('<foo var="', '">');
+                const completions = getCompletions();
+
+                expect(completions.length).toBe(0);
+            });
+
+            it('returns completions after a given prefix', () => {
+                setContent('<foo var="initPar', '">');
+                const completions = getCompletions(true);
+
+                expect(completions.length).toBeGreaterThan(0);
+            });
+
+            it('shows the correct information', () => {
+                setContent('<foo var="initPar', '">');
+                const completion = getCompletion('initParam');
+
+                expect(completion).toBeDefined();
+                expect(completion.text).toContain('initParam');
+                expect(completion.type).toBe('variable');
+            });
+
+            it('is case insensitive', () => {
+                setContent('<foo var="iNitpAr', '">');
+                const completion = getCompletion('initParam');
+
+                expect(completion).toBeDefined();
+                expect(completion.replacementPrefix).toBe('iNitpAr');
+            });
+
+            it('supports abbreviations', () => {
+                setContent('<foo var="ip', '">');
+                const completion = getCompletion('initParam');
+
+                expect(completion).toBeDefined();
+                expect(completion.replacementPrefix).toBe('ip');
+            });
+        });
+
+        describe('scope attribute', () => {
+            it('returns no completions in empty attribute', () => {
+                setContent('<foo scope="', '">');
+                const completions = getCompletions();
+
+                expect(completions.length).toBe(0);
+            });
+
+            it('returns completions after a given prefix', () => {
+                setContent('<foo scope="req', '">');
+                const completions = getCompletions(true);
+
+                expect(completions.length).toBeGreaterThan(0);
+            });
+
+            it('shows the correct information', () => {
+                setContent('<foo scope="reque', '">');
+                const completion = getCompletion('request');
+
+                expect(completion).toBeDefined();
+                expect(completion.text).toBe('request');
+                expect(completion.type).toBe('namespace');
+                expect(completion.replacementPrefix).toBe('reque');
+            });
+
+            it('is case insensitive', () => {
+                setContent('<foo scope="rEqU', '">');
+                const completion = getCompletion('request');
+
+                expect(completion).toBeDefined();
+                expect(completion.replacementPrefix).toBe('rEqU');
+            });
+        });
     });
 });
