@@ -26,9 +26,13 @@ See [setup][setup] for an explanation how to get autocompletion based on `.tld` 
 ### Abbreviations
 ![Autocompletion for abbreviations][screenshot-abbreviations]
 
+### Autocompletion for tags from `.tld` files
+
+### Autocompletion for attributes from `.tld` files
+
+### Autocompletion for attributes values (`scope`, `var`)
 
 ## Goals
-- Tag autocompletion based on `.tld` files
 - EL autocompletion for properties
 
 ## What this package won't do
