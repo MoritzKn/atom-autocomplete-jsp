@@ -4,7 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 1.0.0 - 2017-02-10
+### Added
+- Completion for tags, attributes and attribute values
+- Specs for tag, attribute and attribute value completion
+
+### Fixed
+- Problem with new lines in method signatures from `.tld` files
+
+### Changed
+- Favor variables from `<c:useBean>` tags over vars from `<c:set>` tags
 
 ## 0.4.1 - 2016-12-24
 ### Changed
