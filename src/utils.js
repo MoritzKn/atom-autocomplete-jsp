@@ -36,7 +36,7 @@ export const attrRegExp = (() => {
             return regExp;
         }
     };
-}());
+})();
 
 /**
  * Finds all attributes in a XML tag like text

@@ -136,7 +136,7 @@ function getTagSuggestions(request) {
                 replacementPrefix: request.prefix.replace(/^\s*(?:<\/?)?/, ''),
             };
         }
-    }());
+    })();
 
     if (!activatedManually) {
         const minLen = atom.config.get('autocomplete-plus.minimumWordLength');
