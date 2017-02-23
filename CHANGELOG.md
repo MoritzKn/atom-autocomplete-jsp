@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.1.0 - 2017-02-24
+### Added
+- Mechanism to follow include directives to find all declared taglibs
+- More screenshots
+
 ## 1.0.1 - 2017-02-16
 ### Fixes
 - Syntax Error (Only relevant for a future Atom version with a new Babel configuration)
