@@ -27,10 +27,14 @@ See [setup][setup] for an explanation how to get autocompletion based on `.tld` 
 ![Autocompletion for abbreviations][screenshot-abbreviations]
 
 ### Autocompletion for tags from `.tld` files
+![Autocompletion for tag][screenshot-tag]
 
 ### Autocompletion for attributes from `.tld` files
+![Autocompletion for tag attributes][screenshot-tag-attributes]
 
 ### Autocompletion for attributes values (`scope`, `var`)
+![Autocompletion for var attribute][screenshot-var-attribute]
+![Autocompletion for scope attribute][screenshot-scope-attribute]
 
 ## Goals
 - EL autocompletion for properties
@@ -42,17 +46,17 @@ See [setup][setup] for an explanation how to get autocompletion based on `.tld` 
 - `tldSources`: array of directories containing tld files
 
 ## Setup
-* Install this package 
+* Install this package
 ```sh
 apm install autocomplete-jsp
 ```
 
-* Set the configuration `autocomplete-jsp.tldSources` to a directory of your choice, for example `~/tlds` and make sure this directory exist. 
+* Set the configuration `autocomplete-jsp.tldSources` to a directory of your choice, for example `~/tlds` and make sure this directory exist.
 ```sh
 mkdir ~/tlds
 ```
 
-* Make sure all [JSTL][jstl] TLDs are in this directory 
+* Make sure all [JSTL][jstl] TLDs are in this directory
 ```sh
 cd ~/tlds
 wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/fn.tld
@@ -62,25 +66,28 @@ wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/MET
 wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/x.tld
 ```
 
-* Copy all your custom `.tld` files into this directory 
+* Copy all of your custom `.tld` files into this directory
 ```sh
 cp ~/workspace/someProject/src/main/resources/WEB-INF/*.tld ~/tlds
-# or even
+# or perhaps even
 cp ~/workspace/*/src/**.tld ~/tlds/
 ```
 
+## License
+This project is licensed under the terms of the MIT license. A copy of the license can be found
+in the root directory of the project in the file [LICENSE.md](./LICENSE.md).
 
 [setup]: https://github.com/MoritzKn/atom-autocomplete-jsp/blob/master/README.md#setup
 [changelog]: https://github.com/MoritzKn/atom-autocomplete-jsp/blob/master/CHANGELOG.md
 [jstl]: https://jstl.java.net/
 
 [screenshot-implicit-objects]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-implicit-objects.png
-[screenshot-keywords]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-keywords.png
-[screenshot-tags-set]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tags-set.png
-[screenshot-tags-use-bean]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tags-use-bean.png
-[screenshot-tag-functions]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tag-functions.png
-[screenshot-abbreviations]: https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-abbreviations.png
-
-## License
-This project is licensed under the terms of the MIT license. A copy of the license can be found 
-in the root directory of the project in the file [LICENSE.md](./LICENSE.md).
+[screenshot-keywords]:         https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-keywords.png
+[screenshot-tags-set]:         https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tags-set.png
+[screenshot-tags-use-bean]:    https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tags-use-bean.png
+[screenshot-tag-functions]:    https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tag-functions.png
+[screenshot-abbreviations]:    https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-abbreviations.png
+[screenshot-tag]:              https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tag.png
+[screenshot-tag-attributes]:   https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-tag-attributes.png
+[screenshot-var-attribute]:    https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-var-attribute.png
+[screenshot-scope-attribute]:  https://raw.githubusercontent.com/MoritzKn/atom-autocomplete-jsp/master/doc/img/screenshot-scope-attribute.png
