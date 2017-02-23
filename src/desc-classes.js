@@ -31,13 +31,12 @@ function check(name, prefix) {
 }
 
 function getTaglibNamespace(declaredTaglibs, taglib) {
-    let ns;
-    declaredTaglibs.forEach(item => {
-        if (item.desc === taglib) {
-            ns = item.prefix;
-        }
-    });
-    return ns;
+    const item = declaredTaglibs.find(item => item.desc === taglib);
+    if (item) {
+        return item.prefix;
+    } else {
+        return undefined;
+    }
 }
 
 function escapeSnippet(text) {
@@ -143,7 +142,7 @@ export class TagFunctionDesc extends GenericDesc {
 
     filter({prefix, declaredTaglibs}) {
         const ns = getTaglibNamespace(declaredTaglibs, this.taglib);
-        if (typeof ns === 'undefined') {
+        if (!ns) {
             return false;
         }
         const nsLower = ns.toLowerCase();
@@ -160,7 +159,7 @@ export class TagFunctionDesc extends GenericDesc {
 
     suggestion({replacementPrefix, declaredTaglibs}) {
         const ns = getTaglibNamespace(declaredTaglibs, this.taglib);
-        if (typeof ns === 'undefined') {
+        if (!ns) {
             throw new Error(`Expected declaredTaglibs to contain ${this.tld}`);
         }
         return {
@@ -197,7 +196,8 @@ export class TagDesc extends GenericDesc {
         const selfClosing = this.content === 'empty';
 
         const getEnd = snippetIndex => {
-            let attrJump = this.attributes.length - requiredAttrs.length > 0 ? snippetJump(snippetIndex) : '';
+            const notRequiredCount = this.attributes.length - requiredAttrs.length;
+            const attrJump = notRequiredCount > 0 ? snippetJump(snippetIndex) : '';
 
             if (selfClosing) {
                 return `${attrJump}/>$0`;
@@ -219,7 +219,7 @@ export class TagDesc extends GenericDesc {
 
     filter({prefix, declaredTaglibs}) {
         const ns = getTaglibNamespace(declaredTaglibs, this.taglib);
-        if (typeof ns === 'undefined') {
+        if (!ns) {
             return false;
         }
         const nsLower = ns.toLowerCase();
@@ -236,7 +236,7 @@ export class TagDesc extends GenericDesc {
 
     suggestion({replacementPrefix, declaredTaglibs, onlyTagName, isClosingTag}) {
         const ns = getTaglibNamespace(declaredTaglibs, this.taglib);
-        if (typeof ns === 'undefined') {
+        if (!ns) {
             throw new Error(`Expected "declaredTaglibs" to contain ${this.tld}`);
         }
 

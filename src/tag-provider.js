@@ -44,11 +44,6 @@ function getAttributeValueSuggestions(request) {
     }
 
     const attrName = attrMatch[1];
-
-    if (!['var', 'varStatus', 'scope'].includes(attrName)) {
-        return [];
-    }
-
     const replacementPrefix = attrMatch[2];
 
     if (!activatedManually) {

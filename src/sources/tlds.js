@@ -131,7 +131,7 @@ function readInTld(path) {
                     });
                 }
 
-                if (typeof doc.taglib === 'undefined') {
+                if (!doc.taglib) {
                     return reject({
                         msg: `Parsing XML in '${path}' failed`,
                         causedBy: new Error(),
