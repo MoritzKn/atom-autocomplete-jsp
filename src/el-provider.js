@@ -2,7 +2,7 @@
 
 import match from 'match-like';
 
-import {getDeclaredTaglibs} from './get-declared-taglibs';
+import {findDeclaredTaglibs} from './find-declared-taglibs';
 import {getAll as getRegistryElements} from './registry';
 import {TagFunctionDesc, VarDesc, KeywordDesc} from './desc-classes';
 
@@ -28,7 +28,7 @@ const contextTests = [{
 }];
 
 /**
- * detects the context of the completion
+ * Detects the context of the completion
  * @param   {string} preCursor part of the expression before the cursor
  * @returns {Context}
  */
@@ -104,26 +104,27 @@ export default {
         const replacementPrefix = getCompletionPrefix(preCursor);
 
         if (!replacementPrefix) {
-            return [];
+            return null;
         }
 
         if (!activatedManually) {
             const minLen = atom.config.get('autocomplete-plus.minimumWordLength');
             if (replacementPrefix.length < minLen) {
-                return [];
+                return null;
             }
         }
 
         const preText = editor.buffer.getTextInRange([[0, 0], bufferPosition]);
-        const declaredTaglibs = getDeclaredTaglibs(preText);
 
-        const context = getcompletionContext(preCursor);
-        const prefix = replacementPrefix.toLowerCase();
-        const validTypes = getTypesForContext(context);
+        return findDeclaredTaglibs(preText, editor.getPath()).then(declaredTaglibs => {
+            const context = getcompletionContext(preCursor);
+            const prefix = replacementPrefix.toLowerCase();
+            const validTypes = getTypesForContext(context);
 
-        return getRegistryElements()
-            .filter(desc => validTypes.some(cons => desc instanceof cons))
-            .filter(desc => desc.filter({prefix, declaredTaglibs}))
-            .map(desc => desc.suggestion({replacementPrefix, declaredTaglibs}));
+            return getRegistryElements()
+                .filter(desc => validTypes.some(cons => desc instanceof cons))
+                .filter(desc => desc.filter({prefix, declaredTaglibs}))
+                .map(desc => desc.suggestion({replacementPrefix, declaredTaglibs}));
+        });
     },
 };

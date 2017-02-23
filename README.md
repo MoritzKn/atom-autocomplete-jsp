@@ -36,6 +36,9 @@ See [setup][setup] for an explanation how to get autocompletion based on `.tld` 
 ![Autocompletion for var attribute][screenshot-var-attribute]
 ![Autocompletion for scope attribute][screenshot-scope-attribute]
 
+### Follows include directives to find taglib declarations
+To find all taglib declarations the package crawls the file system by following include directives.
+
 ## Goals
 - EL autocompletion for properties
 

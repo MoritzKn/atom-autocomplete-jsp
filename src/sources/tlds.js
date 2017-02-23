@@ -3,7 +3,7 @@
 import fs from 'fs-plus';
 import xml2js from 'xml2js';
 import {TaglibDesc, TagFunctionDesc, TagDesc, TagAttrDesc} from '../desc-classes';
-import {add as addToRegistry} from '../registry';
+import * as registry from '../registry';
 import {getDeepPropSave as gdps} from '../utils';
 
 const methodSignatureRegExp = new RegExp(
@@ -146,7 +146,6 @@ function readInTld(path) {
 }
 
 function readDir(path) {
-    path = path.replace(/[/\\]$/, '');
     return new Promise((resolve, reject) =>
         fs.readdir(path, (err, fileNames) => {
             if (err) {
@@ -162,15 +161,32 @@ function readDir(path) {
 }
 
 export function readAndRegisterTlds(paths) {
-    return Promise.all(paths.map(readInTld))
-        .then(tldDescs => tldDescs
-            // TODO: reload on file change
-            .forEach(tldDesc => {
-                addToRegistry({ element: tldDesc });
-                tldDesc.functions.forEach(desc => addToRegistry({ element: desc }));
-                tldDesc.tags.forEach(desc => addToRegistry({ element: desc }));
-            })
-        );
+
+
+    return Promise.all(paths.map(readInTld).map(prom => prom.then(tldDesc => {
+        registry.getAllEntries({
+            type: TaglibDesc,
+            filter: [{
+                name: 'uri',
+                value: tldDesc.uri
+            }]
+        }).forEach(entry => {
+            const element = entry.get();
+
+            registry.getAllEntries({
+                filter: [{
+                    name: 'taglib',
+                    value: element
+                }]
+            }).forEach(entry => entry.remove());
+
+            entry.remove();
+        });
+
+        registry.add({ element: tldDesc });
+        tldDesc.functions.forEach(desc => registry.add({ element: desc }));
+        tldDesc.tags.forEach(desc => registry.add({ element: desc }));
+    })));
 }
 
 export function register() {

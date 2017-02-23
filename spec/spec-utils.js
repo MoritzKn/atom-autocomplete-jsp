@@ -31,11 +31,10 @@ function mkUtilFunctions ({editor, pkg, provider, sourceTlds, VarDesc, registry}
             return Promise.resolve(provider.getSuggestions(request));
         },
 
-        loadTestTld: () => {
-            const testTld = `${pkg.path}/spec/fixtures/tlds/test.tld`;
-            return sourceTlds.readAndRegisterTlds([testTld]);
+        loadTestTld: (fileNames=['test.tld']) => {
+            const testTldsPathes = fileNames.map(fileName => `${pkg.path}/spec/fixtures/tlds/${fileName}`);
+            return sourceTlds.readAndRegisterTlds(testTldsPathes);
         },
-
 
         setContent: (pre, after='') => {
             const text = pre + after;

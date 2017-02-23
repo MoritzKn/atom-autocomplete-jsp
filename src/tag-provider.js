@@ -1,6 +1,6 @@
 'use babel';
 
-import {getDeclaredTaglibs} from './get-declared-taglibs';
+import {findDeclaredTaglibs} from './find-declared-taglibs';
 import {extractAttributes} from './utils';
 import {TagDesc, VarDesc, ScopeDesc} from './desc-classes';
 import {getAll as getRegistryElements} from './registry';
@@ -49,22 +49,25 @@ function getAttributeValueSuggestions(request) {
     if (!activatedManually) {
         const minLen = atom.config.get('autocomplete-plus.minimumWordLength');
         if (replacementPrefix.length < minLen) {
-            return [];
+            return null;
         }
     }
 
     const prefix = replacementPrefix.toLowerCase();
 
+    let suggestions = null;
     if (['var', 'varStatus'].includes(attrName)) {
-        return getRegistryElements({type: VarDesc})
+        suggestions = getRegistryElements({type: VarDesc})
             .filter(desc => desc.name !== replacementPrefix || desc.type)
             .filter(desc => desc.filter({prefix}))
             .map(desc => desc.suggestion({replacementPrefix}));
     } else if (attrName === 'scope') {
-        return getRegistryElements({type: ScopeDesc})
+        suggestions = getRegistryElements({type: ScopeDesc})
             .filter(desc => desc.filter({prefix}))
             .map(desc => desc.suggestion({replacementPrefix}));
     }
+
+    return Promise.resolve(suggestions);
 }
 
 
@@ -89,31 +92,33 @@ function getAttributeSuggestions(request) {
     const tagName = tagMatch[2];
     const tagHead = tagMatch[3];
 
-    const declaredTaglibs = getDeclaredTaglibs(preText);
-    const taglibDesc = declaredTaglibs
-        .filter(data => data.prefix === namespace)
-        .map(data => data.desc)[0];
+    return findDeclaredTaglibs(preText, editor.getPath()).then(declaredTaglibs => {
+        const taglibDesc = declaredTaglibs
+            .filter(data => data.prefix === namespace)
+            .map(data => data.desc)[0];
 
-    if (!taglibDesc) {
-        return [];
-    }
+        if (!taglibDesc) {
+            return [];
+        }
 
-    const tagDesc = taglibDesc.tags.find(tagDesc => tagDesc.name === tagName);
+        const tagDesc = taglibDesc.tags.find(tagDesc => tagDesc.name === tagName);
 
-    if (!tagDesc) {
-        return [];
-    }
+        if (!tagDesc) {
+            return [];
+        }
 
+        const afterText = editor.buffer.getTextInRange([bufferPosition, editor.buffer.getEndPosition()]);
+        const afterTagHeadMatch = (afterText.match(/^[^<]*>/) || {})[0] || '';
+        const usedAttributes = Object.keys(extractAttributes(tagHead + afterTagHeadMatch));
 
-    const afterText = editor.buffer.getTextInRange([bufferPosition, editor.buffer.getEndPosition()]);
-    const afterTagHeadMatch = (afterText.match(/^[^<]*>/) || {})[0] || '';
-    const usedAttributes = Object.keys(extractAttributes(tagHead + afterTagHeadMatch));
+        const prefix = replacementPrefix.toLowerCase();
+        const suggestions = tagDesc.attributes
+            .filter(desc => !usedAttributes.includes(desc.name))
+            .filter(desc => desc.filter({prefix}))
+            .map(desc => desc.suggestion({replacementPrefix, namespace}));
 
-    const prefix = replacementPrefix.toLowerCase();
-    return tagDesc.attributes
-        .filter(desc => !usedAttributes.includes(desc.name))
-        .filter(desc => desc.filter({prefix}))
-        .map(desc => desc.suggestion({replacementPrefix, namespace}));
+        return suggestions;
+    });
 }
 
 function getTagSuggestions(request) {
@@ -136,19 +141,22 @@ function getTagSuggestions(request) {
     if (!activatedManually) {
         const minLen = atom.config.get('autocomplete-plus.minimumWordLength');
         if (replacementPrefix.length < minLen) {
-            return [];
+            return null;
         }
     }
 
-    const declaredTaglibs = getDeclaredTaglibs(preText);
-    const prefix = replacementPrefix.toLowerCase();
+    return findDeclaredTaglibs(preText, editor.getPath()).then(declaredTaglibs => {
+        const prefix = replacementPrefix.toLowerCase();
 
-    const afterText = editor.buffer.getTextInRange([bufferPosition, editor.buffer.getEndPosition()]);
-    const onlyTagName = /^[^<]*>/.test(afterText);
+        const afterText = editor.buffer.getTextInRange([bufferPosition, editor.buffer.getEndPosition()]);
+        const onlyTagName = /^[^<]*>/.test(afterText);
 
-    return getRegistryElements({type: TagDesc})
-        .filter(desc => desc.filter({prefix, declaredTaglibs}))
-        .map(desc => desc.suggestion({replacementPrefix, declaredTaglibs, isClosingTag, onlyTagName}));
+        const suggestions = getRegistryElements({type: TagDesc})
+            .filter(desc => desc.filter({prefix, declaredTaglibs}))
+            .map(desc => desc.suggestion({replacementPrefix, declaredTaglibs, isClosingTag, onlyTagName}));
+
+        return suggestions;
+    });
 }
 
 

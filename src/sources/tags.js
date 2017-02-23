@@ -26,7 +26,14 @@ export function register() {
         }
 
         let localVersion = version;
-        const editorText = atom.workspace.getActiveTextEditor().getText();
+        const editor = atom.workspace.getActiveTextEditor();
+
+        if (!editor) {
+            version += 1;
+            return;
+        }
+
+        const editorText = editor.getText();
 
         const refreshHandler = function() {
             if (version > localVersion) {
