@@ -2,7 +2,7 @@
 
 import match from 'match-like';
 
-import {getUsedTaglibs} from './get-used-taglibs';
+import {getDeclaredTaglibs} from './get-declared-taglibs';
 import {getAll as getRegistryElements} from './registry';
 import {TagFunctionDesc, VarDesc, KeywordDesc} from './desc-classes';
 
@@ -115,7 +115,7 @@ export default {
         }
 
         const preText = editor.buffer.getTextInRange([[0, 0], bufferPosition]);
-        const usedTaglibs = getUsedTaglibs(preText);
+        const declaredTaglibs = getDeclaredTaglibs(preText);
 
         const context = getcompletionContext(preCursor);
         const prefix = replacementPrefix.toLowerCase();
@@ -123,7 +123,7 @@ export default {
 
         return getRegistryElements()
             .filter(desc => validTypes.some(cons => desc instanceof cons))
-            .filter(desc => desc.filter({prefix, usedTaglibs}))
-            .map(desc => desc.suggestion({replacementPrefix, usedTaglibs}));
+            .filter(desc => desc.filter({prefix, declaredTaglibs}))
+            .map(desc => desc.suggestion({replacementPrefix, declaredTaglibs}));
     },
 };

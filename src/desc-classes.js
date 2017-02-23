@@ -30,9 +30,9 @@ function check(name, prefix) {
            name.toLowerCase().startsWith(prefix);
 }
 
-function getTaglibNamespace(usedTaglibs, taglib) {
+function getTaglibNamespace(declaredTaglibs, taglib) {
     let ns;
-    usedTaglibs.forEach(item => {
+    declaredTaglibs.forEach(item => {
         if (item.desc === taglib) {
             ns = item.prefix;
         }
@@ -141,8 +141,8 @@ export class TagFunctionDesc extends GenericDesc {
         return `${ns}:${name}(${argsStr})`;
     }
 
-    filter({prefix, usedTaglibs}) {
-        const ns = getTaglibNamespace(usedTaglibs, this.taglib);
+    filter({prefix, declaredTaglibs}) {
+        const ns = getTaglibNamespace(declaredTaglibs, this.taglib);
         if (typeof ns === 'undefined') {
             return false;
         }
@@ -158,10 +158,10 @@ export class TagFunctionDesc extends GenericDesc {
         }
     }
 
-    suggestion({replacementPrefix, usedTaglibs}) {
-        const ns = getTaglibNamespace(usedTaglibs, this.taglib);
+    suggestion({replacementPrefix, declaredTaglibs}) {
+        const ns = getTaglibNamespace(declaredTaglibs, this.taglib);
         if (typeof ns === 'undefined') {
-            throw new Error(`Expected usedTaglibs to contain ${this.tld}`);
+            throw new Error(`Expected declaredTaglibs to contain ${this.tld}`);
         }
         return {
             snippet: this.getSnippet(ns),
@@ -217,8 +217,8 @@ export class TagDesc extends GenericDesc {
         }
     }
 
-    filter({prefix, usedTaglibs}) {
-        const ns = getTaglibNamespace(usedTaglibs, this.taglib);
+    filter({prefix, declaredTaglibs}) {
+        const ns = getTaglibNamespace(declaredTaglibs, this.taglib);
         if (typeof ns === 'undefined') {
             return false;
         }
@@ -234,10 +234,10 @@ export class TagDesc extends GenericDesc {
         }
     }
 
-    suggestion({replacementPrefix, usedTaglibs, onlyTagName, isClosingTag}) {
-        const ns = getTaglibNamespace(usedTaglibs, this.taglib);
+    suggestion({replacementPrefix, declaredTaglibs, onlyTagName, isClosingTag}) {
+        const ns = getTaglibNamespace(declaredTaglibs, this.taglib);
         if (typeof ns === 'undefined') {
-            throw new Error(`Expected "usedTaglibs" to contain ${this.tld}`);
+            throw new Error(`Expected "declaredTaglibs" to contain ${this.tld}`);
         }
 
 

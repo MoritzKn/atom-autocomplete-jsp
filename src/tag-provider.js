@@ -1,6 +1,6 @@
 'use babel';
 
-import {getUsedTaglibs} from './get-used-taglibs';
+import {getDeclaredTaglibs} from './get-declared-taglibs';
 import {extractAttributes} from './utils';
 import {TagDesc, VarDesc, ScopeDesc} from './desc-classes';
 import {getAll as getRegistryElements} from './registry';
@@ -94,8 +94,8 @@ function getAttributeSuggestions(request) {
     const tagName = tagMatch[2];
     const tagHead = tagMatch[3];
 
-    const usedTaglibs = getUsedTaglibs(preText);
-    const taglibDesc = usedTaglibs
+    const declaredTaglibs = getDeclaredTaglibs(preText);
+    const taglibDesc = declaredTaglibs
         .filter(data => data.prefix === namespace)
         .map(data => data.desc)[0];
 
@@ -145,15 +145,15 @@ function getTagSuggestions(request) {
         }
     }
 
-    const usedTaglibs = getUsedTaglibs(preText);
+    const declaredTaglibs = getDeclaredTaglibs(preText);
     const prefix = replacementPrefix.toLowerCase();
 
     const afterText = editor.buffer.getTextInRange([bufferPosition, editor.buffer.getEndPosition()]);
     const onlyTagName = /^[^<]*>/.test(afterText);
 
     return getRegistryElements({type: TagDesc})
-        .filter(desc => desc.filter({prefix, usedTaglibs}))
-        .map(desc => desc.suggestion({replacementPrefix, usedTaglibs, isClosingTag, onlyTagName}));
+        .filter(desc => desc.filter({prefix, declaredTaglibs}))
+        .map(desc => desc.suggestion({replacementPrefix, declaredTaglibs, isClosingTag, onlyTagName}));
 }
 
 

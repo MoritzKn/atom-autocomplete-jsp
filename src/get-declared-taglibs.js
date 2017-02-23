@@ -28,7 +28,7 @@ const useTaglibNsRegExp = new RegExp(
  * @param   {string} text relevant editor content
  * @returns {Array}
  */
-export function getUsedTaglibs(text) {
+export function getDeclaredTaglibs(text) {
     const uris = {};
 
     [useTaglibRegExp, useTaglibXmlRegExp].forEach(regExp => {
