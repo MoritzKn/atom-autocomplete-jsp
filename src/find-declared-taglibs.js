@@ -194,7 +194,7 @@ function scanAndCacheAndCrawl(content, filePath, includeTrace) {
 export function findDeclaredTaglibs(text, filePath) {
     const scanPromise = filePath ? scanAndCacheAndCrawl(text, filePath, []) : scanText(text);
 
-    return scanPromise.then((infos) => {
+    return scanPromise.then(infos => {
         const uris = {};
         infos.taglibDeclarationNamespaces.forEach(dec => uris[dec.uri] = dec.prefix);
         infos.taglibDeclarationDirectives.forEach(dec => uris[dec.uri] = dec.prefix);

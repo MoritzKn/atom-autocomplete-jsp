@@ -45,7 +45,7 @@ function mkUtilFunctions ({editor, pkg, provider, sourceTlds, VarDesc, registry}
             editor.setCursorBufferPosition([lastLineIndex, lastColumnIndex]);
         },
 
-        varInRegistry: (varName) => {
+        varInRegistry: varName => {
             return registry.getAll({
                 type: VarDesc,
                 filter: [{

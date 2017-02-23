@@ -43,7 +43,7 @@ export function register() {
             }
         };
 
-        (editorText.match(useBeanRegExp) || []).forEach((matchText) => {
+        (editorText.match(useBeanRegExp) || []).forEach(matchText => {
             const attributes = extractAttributes(matchText);
 
             const otherRefsEntries = registry.getAllEntries({
@@ -79,7 +79,7 @@ export function register() {
             });
         });
 
-        (editorText.match(varRegExp) || []).forEach((matchText) => {
+        (editorText.match(varRegExp) || []).forEach(matchText => {
             const varName = extractAttributes(matchText).var;
 
             const otherRefs = registry.getAll({
