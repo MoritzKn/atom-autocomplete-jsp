@@ -1,12 +1,15 @@
 'use babel';
 
-let cache = new WeakMap();
-
 const registry = new Map();
 const refreshHandlers = [];
 
-function cleanCache() {
-    cache = new WeakMap();
+let cache = new WeakMap();
+function cleanCache(forType) {
+    if (forType) {
+        cache[forType] = null;
+    } else {
+        cache = new WeakMap();
+    }
 }
 
 class RegistryEntry {
@@ -43,11 +46,12 @@ class RegistryEntry {
         if (this.id === null) {
             throw new Error('This entry is not part of the registry');
         }
+        const type = this.element.constructor;
 
         const wasInRegistry = registry.delete(this.id);
         if (wasInRegistry) {
             this.id = null;
-            cleanCache();
+            cleanCache(type);
         } else {
             throw new Error('This entry is not part of the registry');
         }
@@ -75,7 +79,9 @@ export function add(options) {
     const id = Symbol();
     entry.id = id;
     registry.set(id, entry);
-    cleanCache();
+
+    const type = options.element.constructor;
+    cleanCache(type);
 }
 
 function applyFilters(filter, element) {
@@ -104,37 +110,33 @@ function applyFilters(filter, element) {
 }
 
 function registryEntries() {
-    if (cache.registryEntries) {
-        return cache.registryEntries;
-    }
-
     const entries = [];
     registry.forEach(entry => entries.push(entry));
-    cache.registryEntries = entries;
     return entries;
 }
 
-export function getAll({type, filter=[]}={}, doRefresh=true) {
+function registryEntriesByType(type) {
+    if (type) {
+         if (!cache[type]) {
+            cache[type] = registryEntries().filter(element => element.get() instanceof type);
+        }
+        return cache[type];
+    } else {
+        return registryEntries();
+    }
+}
+
+export function getAllEntries({type, filter=[]}={}, doRefresh=true) {
     if (doRefresh) {
         refresh();
     }
 
-    let all = registryEntries().map(entry => entry.get());
+    return registryEntriesByType(type).filter(entry => {
+        const element = entry.get();
+        return element && applyFilters(filter, element);
+    });
+}
 
-    if (type) {
-        if (!cache.byType) {
-            cache.byType = new WeakMap();
-        }
-
-         if (cache.byType[type]) {
-            all = cache.byType[type];
-        } else {
-            all = all.filter(element => element instanceof type);
-            cache.byType[type] = all;
-        }
-    }
-
-    all = all.filter(element => applyFilters(filter, element));
-
-    return all;
+export function getAll({type, filter=[]}={}, doRefresh=true) {
+    return getAllEntries({type, filter}, doRefresh).map(entry => entry.get());
 }

@@ -5,7 +5,7 @@ import {VarDesc} from '../desc-classes';
 import {extractAttributes} from '../utils';
 
 const varRegExp = /<[a-zA-Z0-9_\-]+:[a-zA-Z0-9_\-]+\s+[^>]*var="([^"]*)"[^>]*>/g;
-const useBeanRegExp = /<jsp:useBean\s+[^>]*((?:class|id)="[^"]*")\s+[^>]*((?:class|id)="[^"]*"\s*)[^>]*\/?>/g;
+const useBeanRegExp = /<jsp:useBean[^>]*>/g;
 
 /**
  * The live time of the detected elements i.e. the refresh rate
@@ -36,40 +36,50 @@ export function register() {
             }
         };
 
-        editorText.replace(useBeanRegExp, (matchText) => {
+        (editorText.match(useBeanRegExp) || []).forEach((matchText) => {
             const attributes = extractAttributes(matchText);
 
-            const idValue = attributes.id;
-            const classValue = attributes.class;
-
-            const otherRefs = registry.getAll({
+            const otherRefsEntries = registry.getAllEntries({
                 type: VarDesc,
                 filter: [{
                     name: 'name',
-                    value: idValue,
+                    value: attributes.id,
                 }],
             }, false);
 
-            if (otherRefs.length > 0) {
-                return;
+            if (otherRefsEntries.length > 0) {
+                let override = false;
+                for (let entry of otherRefsEntries) {
+                    const element = entry.get();
+                    if (element.type !== attributes.class) {
+                        entry.remove();
+                        override = true;
+                    }
+                }
+
+                if (!override) {
+                    return;
+                }
             }
 
             registry.add({
                 element: new VarDesc({
-                    type: classValue,
-                    name: idValue
+                    type: attributes.class,
+                    name: attributes.id
                 }),
                 refresh: refreshHandler,
+                liveTime,
             });
         });
 
-        // Use replace because it's the only way to get all matches and all groups
-        editorText.replace(varRegExp, (matchText, name) => {
+        (editorText.match(varRegExp) || []).forEach((matchText) => {
+            const varName = extractAttributes(matchText).var;
+
             const otherRefs = registry.getAll({
                 type: VarDesc,
                 filter: [{
                     name: 'name',
-                    value: name,
+                    value: varName,
                 }],
             }, false);
 
@@ -78,7 +88,7 @@ export function register() {
             }
 
             registry.add({
-                element: new VarDesc({ name }),
+                element: new VarDesc({ name: varName }),
                 refresh: refreshHandler,
                 liveTime,
             });

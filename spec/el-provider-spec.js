@@ -185,6 +185,28 @@ describe('JSP autocompletions EL provider', () => {
                 }
             });
         });
+
+        it('allway takes the last useBean', () => {
+            setContent(`
+                <jsp:useBean id="foo" class="java.utils.HashMap">
+                <c:set var="foo" value="bar" />
+                <jsp:useBean id="foo" class="java.utils.ArrayList">
+                <c:set var="foo" value="bar" />
+
+                \${foo`, '}');
+
+            waitsFor(() => varInRegistry('foo'), 3000);
+
+            runs(() => {
+                const completion = getCompletion('foo');
+
+                expect(completion).toBeDefined();
+                if (completion) {
+                    expect(completion.leftLabel).toBe('ArrayList');
+                    expect(completion.replacementPrefix).toBe('foo');
+                }
+            });
+        });
     });
 
     describe('taglibs handling', () => {
