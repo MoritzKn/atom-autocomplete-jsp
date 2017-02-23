@@ -4,24 +4,59 @@ import {extractAttributes} from './utils';
 import {getAll as getRegistryElements} from './registry';
 import {TaglibDesc} from './desc-classes';
 
-const useTaglibRegExp = new RegExp(
+const declareTaglibRegExp = new RegExp(
     '<%@\\s+taglib\\s+' +
     '((?:prefix|uri)="[^"]*")\\s+' +
     '((?:prefix|uri)="[^"]*")\\s*',
     'g'
 );
 
-const useTaglibXmlRegExp = new RegExp(
+const declareTaglibXmlRegExp = new RegExp(
     '<jsp:directive.taglib\\s+' +
     '((?:prefix|uri)="[^"]*")\\s+' +
     '((?:prefix|uri)="[^"]*")\\s*',
     'g'
 );
 
-const useTaglibNsRegExp = new RegExp(
+const declareTaglibNsRegExp = new RegExp(
     'xmlns:([^=]+)="([^"]+)"',
     'g'
 );
+
+const singleDeclareTaglibNsRegExp = new RegExp(declareTaglibNsRegExp.source);
+
+function getScanText(text) {
+    const infos = {
+        taglibDeclarationDirectives: [],
+        taglibDeclarationNamespaces: [],
+        includeDirectives: [],
+    };
+
+    [declareTaglibRegExp, declareTaglibXmlRegExp].forEach(regExp => {
+        const matches = text.match(regExp);
+        if (matches) {
+            matches.forEach(matchText => {
+                const {prefix, uri} = extractAttributes(matchText);
+                infos.taglibDeclarationDirectives.push({prefix, uri});
+            });
+        }
+    });
+
+    {
+        const matches = text.match(declareTaglibNsRegExp);
+        if (matches) {
+            matches.forEach(matchText => {
+                const [, prefix, uri] = matchText.match(singleDeclareTaglibNsRegExp);
+                infos.taglibDeclarationNamespaces.push({prefix, uri});
+            });
+        }
+        // NOTE: in theory the scope of the taglib declaration ends at the ending tag
+        // corresponding to the start tag the namespace declaration belongs to, but we
+        // ignore those cases in favor of simplicity.
+    }
+
+    return infos;
+}
 
 /**
  * Get the loaded tlds
@@ -29,25 +64,10 @@ const useTaglibNsRegExp = new RegExp(
  * @returns {Array}
  */
 export function getDeclaredTaglibs(text) {
+    const infos = getScanText(text);
     const uris = {};
-
-    [useTaglibRegExp, useTaglibXmlRegExp].forEach(regExp => {
-        const tagMatch = text.match(regExp);
-        if (tagMatch) {
-            tagMatch.forEach(matchText => {
-                const attributes = extractAttributes(matchText);
-                uris[attributes.uri] = attributes.prefix;
-            });
-        }
-    });
-
-    const attrMatch = text.match(useTaglibNsRegExp);
-    if (attrMatch) {
-        attrMatch.forEach(matchText => {
-            const [, ns, uri] = matchText.match(new RegExp(useTaglibNsRegExp.source));
-            uris[uri] = ns;
-        });
-    }
+    infos.taglibDeclarationDirectives.forEach(dec => uris[dec.uri] = dec.prefix);
+    infos.taglibDeclarationNamespaces.forEach(dec => uris[dec.uri] = dec.prefix);
 
     return getRegistryElements({
         type: TaglibDesc,
