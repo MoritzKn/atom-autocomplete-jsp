@@ -9,7 +9,7 @@
  * In that case you could use `getDeepPropSave(foo, 'bar', 'baz')`.
  *
  * @param   {*}        obj
- * @param   {String[]} path
+ * @param   {string[]} path
  * @returns *
  */
 export function getDeepPropSave(obj, ...path) {
