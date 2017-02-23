@@ -23,9 +23,11 @@ describe('JSP autocompletions EL provider', () => {
     let varInRegistry;
 
     beforeEach(() => {
-        waitsForPromise(() => atom.packages.activatePackage('autocomplete-jsp'));
-        waitsForPromise(() => atom.packages.activatePackage('language-java'));
-        waitsForPromise(() => atom.workspace.open('test.jsp'));
+        waitsForPromise(() => Promise.all([
+            atom.packages.activatePackage('autocomplete-jsp'),
+            atom.packages.activatePackage('language-java'),
+            atom.workspace.open('test.jsp'),
+        ]));
 
         runs(() => {
             editor = atom.workspace.getActiveTextEditor();
@@ -55,101 +57,98 @@ describe('JSP autocompletions EL provider', () => {
 
     it('returns no completions inside empty expressions', () => {
         setContent('${', '}');
-        const completions = getCompletions();
 
-        expect(Array.isArray(completions)).toBe(true);
-        expect(completions.length).toBe(0);
+        waitsForPromise(() => getCompletions().then(completions => {
+            if (Array.isArray(completions)) {
+                expect(completions.length).toBe(0);
+            } else {
+                expect(completions).toBe(null);
+            }
+        }));
     });
 
     describe('completions for keyword', () => {
         ['div', 'mod', 'eq', 'ne', 'lt', 'gt', 'le', 'ge', 'and', 'or', 'not', 'empty'].forEach(keyword => {
             it(`returns a completion for ${keyword} keyword'`, () => {
                 setContent('${foo ' + keyword, '}');
-                const completion = getCompletion(keyword, true);
 
-                expect(completion).toBeDefined();
-                if (completion) {
+                waitsForPromise(() => getCompletion(keyword, true).then(completion => {
                     expect(completion.leftLabel).toBeUndefined();
-                    expect(completion.description).toBeDefined();
+                    expect(completion.description).toBeTruthy();
                     expect(completion.type).toBe('keyword');
                     expect(completion.replacementPrefix).toBe(keyword);
-                }
+                }));
             });
         });
 
         it(`is case insensitive'`, () => {
             setContent('${foo nOt', '}');
-            const completion = getCompletion('not', true);
 
-            expect(completion).toBeDefined();
+            waitsForPromise(() => getCompletion('not', true).then(completion => {
+                expect(completion).toBeTruthy();
+            }));
         });
     });
 
     describe('completions for implicit object', () => {
         it('returns a completion for pageContext', () => {
             setContent('${pageCont', '}');
-            const completion = getCompletion('pageContext', true);
 
-            expect(completion).toBeDefined();
-            if (completion) {
+            waitsForPromise(() => getCompletion('pageContext', true).then(completion => {
                 expect(completion.leftLabel).toBe('PageContext');
-                expect(completion.description).toBeDefined();
+                expect(completion.description).toBeTruthy();
                 expect(completion.type).toBe('variable');
                 expect(completion.replacementPrefix).toBe('pageCont');
-            }
+            }));
         });
 
         it('returns a completion for param', () => {
             setContent('${para', '}');
-            const completion = getCompletion('param', true);
 
-            expect(completion).toBeDefined();
-            if (completion) {
+            waitsForPromise(() => getCompletion('param', true).then(completion => {
                 expect(completion.leftLabel).toBe('Map');
-                expect(completion.description).toBeDefined();
+                expect(completion.description).toBeTruthy();
                 expect(completion.type).toBe('variable');
                 expect(completion.replacementPrefix).toBe('para');
-            }
+            }));
         });
 
         it('returns a completion for initParam', () => {
             setContent('${initPa', '}');
-            const completion = getCompletion('initParam', true);
 
-            expect(completion).toBeDefined();
-            if (completion) {
+            waitsForPromise(() => getCompletion('initParam', true).then(completion => {
                 expect(completion.leftLabel).toBe('Map');
-                expect(completion.description).toBeDefined();
+                expect(completion.description).toBeTruthy();
                 expect(completion.type).toBe('variable');
                 expect(completion.replacementPrefix).toBe('initPa');
-            }
+            }));
         });
 
         it('returns a completion for headerValues', () => {
             setContent('${headerVal', '}');
-            const completion = getCompletion('headerValues', true);
 
-            expect(completion).toBeDefined();
-            if (completion) {
+            waitsForPromise(() => getCompletion('headerValues', true).then(completion => {
                 expect(completion.leftLabel).toBe('Map');
-                expect(completion.description).toBeDefined();
+                expect(completion.description).toBeTruthy();
                 expect(completion.type).toBe('variable');
                 expect(completion.replacementPrefix).toBe('headerVal');
-            }
+            }));
         });
 
         it(`is case insensitive'`, () => {
             setContent('${foo pAgeCOnT', '}');
-            const completion = getCompletion('pageContext', true);
 
-            expect(completion).toBeDefined();
+            waitsForPromise(() => getCompletion('pageContext', true).then(completion => {
+                expect(completion).toBeTruthy();
+            }));
         });
 
         it(`supports abbreviations'`, () => {
             setContent('${foo ip', '}');
-            const completion = getCompletion('initParam', true);
 
-            expect(completion).toBeDefined();
+            waitsForPromise(() => getCompletion('initParam', true).then(completion => {
+                expect(completion).toBeTruthy();
+            }));
         });
     });
 
@@ -157,32 +156,28 @@ describe('JSP autocompletions EL provider', () => {
         it('returns completions for variables defined in `<c:set>` tags', () => {
             setContent('<c:set var="fooBarBaz">\n${fooBa', '}');
             waitsFor(() => varInRegistry('fooBarBaz'), 3000);
-            runs(() => {
-                const completion = getCompletion('fooBarBaz');
 
-                expect(completion).toBeDefined();
-                if (completion) {
+            runs(() => {
+                waitsForPromise(() => getCompletion('fooBarBaz').then(completion => {
                     expect(completion.leftLabel).not.toBeTruthy();
                     expect(completion.type).toBe('variable');
                     expect(completion.description).not.toBeTruthy();
                     expect(completion.replacementPrefix).toBe('fooBa');
-                }
+                }));
             });
         });
 
         it('returns completions for variables defined in `<jsp:useBean>`', () => {
             setContent('<jsp:useBean id="myMap" class="java.utils.HashMap">\n${myMa', '}');
             waitsFor(() => varInRegistry('myMap'), 3000);
-            runs(() => {
-                const completion = getCompletion('myMap');
 
-                expect(completion).toBeDefined();
-                if (completion) {
+            runs(() => {
+                waitsForPromise(() => getCompletion('myMap').then(completion => {
                     expect(completion.leftLabel).toBe('HashMap');
                     expect(completion.type).toBe('variable');
                     expect(completion.description).not.toBeTruthy();
                     expect(completion.replacementPrefix).toBe('myMa');
-                }
+                }));
             });
         });
 
@@ -198,13 +193,10 @@ describe('JSP autocompletions EL provider', () => {
             waitsFor(() => varInRegistry('foo'), 3000);
 
             runs(() => {
-                const completion = getCompletion('foo');
-
-                expect(completion).toBeDefined();
-                if (completion) {
+                waitsForPromise(() => getCompletion('foo').then(completion => {
                     expect(completion.leftLabel).toBe('ArrayList');
                     expect(completion.replacementPrefix).toBe('foo');
-                }
+                }));
             });
         });
     });
@@ -212,12 +204,14 @@ describe('JSP autocompletions EL provider', () => {
     describe('taglibs handling', () => {
         it('returns no completions from not imported taglibs', () => {
             waitsForPromise(() => loadTestTld());
+
             runs(() => {
                 setContent('${ts:', '}');
-                const completions = getCompletions();
 
-                expect(Array.isArray(completions)).toBe(true);
-                expect(completions.length).toBe(0);
+                waitsForPromise(() => getCompletions().then(completions => {
+                    expect(Array.isArray(completions)).toBe(true);
+                    expect(completions.length).toBe(0);
+                }));
             });
         });
 
@@ -229,7 +223,10 @@ describe('JSP autocompletions EL provider', () => {
                         'uri="http://example.com/jsp/test" prefix="prefixOfTag" %>\n' +
                         '${prefixOfTag:';
                     setContent(text, '}');
-                    expect(getCompletion('prefixOfTag')).toBeDefined();
+
+                    waitsForPromise(() => getCompletion('prefixOfTag').then(completion => {
+                        expect(completion).toBeTruthy();
+                    }));
                 });
             });
 
@@ -240,7 +237,10 @@ describe('JSP autocompletions EL provider', () => {
                         'uri="http://example.com/jsp/test" prefix="prefixOfTag"/>\n' +
                         '${prefixOfTag:';
                     setContent(text, '}');
-                    expect(getCompletion('prefixOfTag')).toBeDefined();
+
+                    waitsForPromise(() => getCompletion('prefixOfTag').then(completion => {
+                        expect(completion).toBeTruthy();
+                    }));
                 });
             });
 
@@ -250,7 +250,10 @@ describe('JSP autocompletions EL provider', () => {
                     const text = '<someTag xmlns:prefixOfTag="http://example.com/jsp/test"/>\n' +
                         '${prefixOfTag:';
                     setContent(text, '}');
-                    expect(getCompletion('prefixOfTag')).toBeDefined();
+
+                    waitsForPromise(() => getCompletion('prefixOfTag').then(completion => {
+                        expect(completion).toBeTruthy();
+                    }));
                 });
             });
         });
@@ -258,33 +261,59 @@ describe('JSP autocompletions EL provider', () => {
         describe('completions for functions defined in imported taglibs', () => {
             it('is case insensitive', () => {
                 setContent(importTaglibStr + '${prEfIxOfTag:cOn', '}');
-                expect(getCompletion('prefixOfTag:concat')).toBeDefined();
+
+                waitsForPromise(() => getCompletion('prefixOfTag:concat').then(completion => {
+                    expect(completion).toBeTruthy();
+                }));
             });
 
             it('contains the description from the TLD file', () => {
                 setContent(importTaglibStr + '${prefixOfTag:con', '}');
-                expect(getCompletion('prefixOfTag:concat').description).toBe('Concatenates two strings.');
+
+                waitsForPromise(() => getCompletion('prefixOfTag:concat').then(completion => {
+                    expect(completion.description).toBe('Concatenates two strings.');
+                }));
             });
 
             it('contains the type from the TLD file', () => {
                 setContent(importTaglibStr + '${prefixOfTag:con', '}');
-                expect(getCompletion('prefixOfTag:concat').leftLabel).toBe('String');
+
+                waitsForPromise(() => getCompletion('prefixOfTag:concat').then(completion => {
+                    expect(completion.leftLabel).toBe('String');
+                }));
             });
 
             it('is of type function', () => {
                 setContent(importTaglibStr + '${prefixOfTag:con', '}');
-                expect(getCompletion('prefixOfTag:concat').type).toBe('function');
+
+                waitsForPromise(() => getCompletion('prefixOfTag:concat').then(completion => {
+                    expect(completion.type).toBe('function');
+                }));
             });
 
             it('replaces only the namespace and the function name', () => {
-                setContent(importTaglibStr + '${prefixOfTag:con', '}');
-                expect(getCompletion('prefixOfTag:concat').replacementPrefix).toBe('prefixOfTag:con');
+                runs(() => {
+                    setContent(importTaglibStr + '${prefixOfTag:con', '}');
+                });
+                waitsForPromise(() => getCompletion('prefixOfTag:concat').then(completion => {
+                    expect(completion.replacementPrefix).toBe('prefixOfTag:con');
+                }));
 
-                setContent(importTaglibStr + '${prefix', '}');
-                expect(getCompletion('prefixOfTag:concat').replacementPrefix).toBe('prefix');
+                runs(() => {
+                    setContent(importTaglibStr + '${prefix', '}');
+                });
 
-                setContent(importTaglibStr + '${fn:startsWith(prefixOfTag:con', ')}');
-                expect(getCompletion('prefixOfTag:concat').replacementPrefix).toBe('prefixOfTag:con');
+                waitsForPromise(() => getCompletion('prefixOfTag:concat').then(completion => {
+                    expect(completion.replacementPrefix).toBe('prefix');
+                }));
+
+                runs(() => {
+                    setContent(importTaglibStr + '${fn:startsWith(prefixOfTag:con', ')}');
+                });
+
+                waitsForPromise(() => getCompletion('prefixOfTag:concat').then(completion => {
+                    expect(completion.replacementPrefix).toBe('prefixOfTag:con');
+                }));
             });
         });
     });

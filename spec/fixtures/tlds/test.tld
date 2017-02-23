@@ -19,7 +19,7 @@
         </description>
         <name>concat</name>
         <function-class>some.class.path.Functions</function-class>
-        <function-signature>java.lang.String concat(java.lang.String, java.lang.String)</function-signature>
+        <function-signature>java.lang.String concatMethod(java.lang.String, java.lang.String)</function-signature>
         <example>
             &lt;c:if test="${fn:contains(de:concat(firstName, lastName), searchString)}">
         </example>

@@ -1,19 +1,18 @@
-
 const importTaglibStr = '<%@ taglib\nuri="http://example.com/jsp/test" prefix="prefixOfTag" %>\n';
 
 function getProvider(pkg, selector) {
     return pkg.mainModule.getProviders().find(p => p.selector === selector);
 }
 
-function mkUtilFunctions ({editor, pkg, provider, VarDesc, sourceTlds, registry}) {
+function mkUtilFunctions ({editor, pkg, provider, sourceTlds, VarDesc, registry}) {
     const functions = {
         getCompletion: (filter, activatedManually=true) => {
-            const completions = functions.getCompletions(activatedManually);
-
-            const matchingCompletions = completions
-            .filter(comp => (comp.text || comp.snippet).includes(filter));
-
-            return matchingCompletions[0];
+            return functions.getCompletions(activatedManually).then(completions => {
+                if (!completions) {
+                    return undefined;
+                }
+                return completions.find(comp => (comp.text || comp.snippet).includes(filter));
+            });
         },
 
         getCompletions: (activatedManually=false) => {
@@ -22,13 +21,14 @@ function mkUtilFunctions ({editor, pkg, provider, VarDesc, sourceTlds, registry}
             const end = cursor.getBufferPosition();
             const prefix = editor.getTextInRange([start, end]);
             const scopeDescriptor = cursor.getScopeDescriptor();
-            return provider.getSuggestions({
+            const request = {
                 bufferPosition: end,
                 editor,
                 prefix,
                 scopeDescriptor,
                 activatedManually,
-            });
+            };
+            return Promise.resolve(provider.getSuggestions(request));
         },
 
         loadTestTld: () => {
