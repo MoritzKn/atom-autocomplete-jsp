@@ -233,7 +233,7 @@ describe('Find declared taglibs', () => {
             }
         });
 
-        it('it recognizes changes in sub-includes after maximal 1000ms', () => {
+        it('it recognizes changes in sub-includes after maximal 2000ms', () => {
             waitsForPromise(() => atom.workspace.open('project-with-includes/main.jsp'));
 
             runs(() => {
@@ -248,7 +248,7 @@ describe('Find declared taglibs', () => {
                         findDeclaredTaglibs(editor.getText(), openFile).then(taglibs => {
                             if (taglibs.length !== previousLength) {
                                 resultHasChanged = true;
-                            } else if (start + 1000 > Date.now()) {
+                            } else if (start + 2000 > Date.now()) {
                                 loop();
                             }
                         });
@@ -260,12 +260,13 @@ describe('Find declared taglibs', () => {
                     originalContent = fs.readFileSync(changedFile, 'utf-8');
 
                     waitsForPromise(() => findDeclaredTaglibs(editor.getText(), openFile).then(taglibs => {
+                        expect(taglibs.length).toBe(3);
                         fs.writeFileSync(changedFile, '', 'utf-8');
                         watchForChanges(taglibs.length);
                     }));
                 });
 
-                waitsFor(() => resultHasChanged, 1000);
+                waitsFor(() => resultHasChanged, 2000);
 
                 waitsForPromise(() => findDeclaredTaglibs(editor.getText(), openFile).then(taglibs => {
                     expect(taglibs.length).toBe(1);
@@ -278,7 +279,7 @@ describe('Find declared taglibs', () => {
                     watchForChanges(taglibs.length);
                 }));
 
-                waitsFor(() => resultHasChanged, 1000);
+                waitsFor(() => resultHasChanged, 2000);
 
                 waitsForPromise(() => findDeclaredTaglibs(editor.getText(), openFile).then(taglibs => {
                     expect(taglibs.length).toBe(2);
