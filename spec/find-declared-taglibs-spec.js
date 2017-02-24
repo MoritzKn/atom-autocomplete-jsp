@@ -195,6 +195,27 @@ describe('Find declared taglibs', () => {
         });
     });
 
+    it('ignores includes that do not exist and does not crash', () => {
+        waitsForPromise(() => atom.workspace.open('test.jsp'));
+
+
+        runs(() => {
+            const editor = atom.workspace.getActiveTextEditor();
+
+            const text = '<%@ include file="some/non/existingFile.jsp" %>\n' +
+                '<jsp:directive.taglib uri="http://example.com/jsp/test" prefix="test"/>\n';
+
+            editor.setText(text);
+
+            waitsForPromise(() => findDeclaredTaglibs(editor.getText(), editor.getPath()).then(taglibs => {
+                expect(taglibs.length).toBe(1);
+                const element = taglibs.find(item => item.prefix === 'test');
+                expect(element).toBeDefined();
+                expect(element.desc.uri).toBe('http://example.com/jsp/test');
+            }));
+        });
+    });
+
     it('immediately recognizes changes in the editor', () => {
         waitsForPromise(() => atom.workspace.open('test.jsp'));
 
