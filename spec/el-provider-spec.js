@@ -34,9 +34,13 @@ describe('JSP autocompletions EL provider', () => {
             pkg = atom.packages.getActivePackage('autocomplete-jsp');
             provider = getProvider(pkg, '.text.html.jsp .el_expression.jsp');
 
+            const sourceTags = require(`${pkg.path}/src/sources/tags`);
+            sourceTags.setRefreshRate(200);
+
             VarDesc = require(`${pkg.path}/src/desc-classes`).VarDesc;
             registry = require(`${pkg.path}/src/registry`);
             sourceTlds = require(`${pkg.path}/src/sources/tlds`);
+
 
             const functions = utils.mkUtilFunctions({
                 editor,

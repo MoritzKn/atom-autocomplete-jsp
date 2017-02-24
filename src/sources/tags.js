@@ -11,10 +11,14 @@ const useBeanRegExp = /<jsp:useBean[^>]*>/g;
  * The live time of the detected elements i.e. the refresh rate
  * @type {number}
  */
-const liveTime = 2000;
 
+let liveTime = 2000;
 let version = 0;
 let lastChanged = Date.now();
+
+export function setRefreshRate(rate) {
+    liveTime = rate;
+}
 
 export function register() {
     registry.on('refresh', () => {
