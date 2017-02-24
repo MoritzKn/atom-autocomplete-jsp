@@ -269,7 +269,7 @@ describe('Find declared taglibs', () => {
         });
     });
 
-    it('it prefers src/main/* but also accepts src/*/*', () => {
+    it('prefers src/main/* but also accepts src/*/*', () => {
         waitsForPromise(() => atom.workspace.open('project-with-absolute-includes/src/test/webapp/foo/bar.jsp'));
 
         runs(() => {
@@ -299,7 +299,7 @@ describe('Find declared taglibs', () => {
             }
         });
 
-        it('it recognizes changes in sub-includes after maximal 2000ms', () => {
+        it('recognizes changes in sub-includes after maximal 2000ms', () => {
             waitsForPromise(() => atom.workspace.open('project-with-includes/main.jsp'));
 
             runs(() => {
