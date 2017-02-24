@@ -1,5 +1,5 @@
 // jshint jasmine: true
-// jshint jasmine: true
+// jshint maxlen: 120
 /* globals waitsForPromise */
 
 const utils = require('./spec-utils');
@@ -216,8 +216,53 @@ describe('Find declared taglibs', () => {
                 expect(taglibs.find(item => item.prefix === 'foo')).toBeDefined();
             }));
         });
-
     });
+
+    it('resolves absolute paths relative to the webapp directory under src/main/webapp', () => {
+        waitsForPromise(() => atom.workspace.open('project-with-absolute-includes/src/main/webapp/foo/bar.jsp'));
+
+        runs(() => {
+            const editor = atom.workspace.getActiveTextEditor();
+
+            waitsForPromise(() => findDeclaredTaglibs(editor.getText(), editor.getPath()).then(taglibs => {
+                expect(taglibs.length).toBe(1);
+                const element = taglibs.find(item => item.prefix === 'test');
+                expect(element).toBeDefined();
+                expect(element.desc.uri).toBe('http://example.com/jsp/test');
+            }));
+        });
+    });
+
+    it('resolves absolute paths relative to the directory under src/main/* if no webapp directory exists', () => {
+        waitsForPromise(() => atom.workspace.open('project-with-absolute-includes/src/main/resources/foo/bar.jsp'));
+
+        runs(() => {
+            const editor = atom.workspace.getActiveTextEditor();
+
+            waitsForPromise(() => findDeclaredTaglibs(editor.getText(), editor.getPath()).then(taglibs => {
+                expect(taglibs.length).toBe(1);
+                const element = taglibs.find(item => item.prefix === 'test');
+                expect(element).toBeDefined();
+                expect(element.desc.uri).toBe('http://example.com/jsp/test');
+            }));
+        });
+    });
+
+    it('it prefers src/main/* but also accepts src/*/*', () => {
+        waitsForPromise(() => atom.workspace.open('project-with-absolute-includes/src/test/webapp/foo/bar.jsp'));
+
+        runs(() => {
+            const editor = atom.workspace.getActiveTextEditor();
+
+            waitsForPromise(() => findDeclaredTaglibs(editor.getText(), editor.getPath()).then(taglibs => {
+                expect(taglibs.length).toBe(1);
+                const element = taglibs.find(item => item.prefix === 'test');
+                expect(element).toBeDefined();
+                expect(element.desc.uri).toBe('http://example.com/jsp/test');
+            }));
+        });
+    });
+
 
     describe('fs actions', () => {
         const fs = require('fs');

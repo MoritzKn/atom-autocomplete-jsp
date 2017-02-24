@@ -64,6 +64,57 @@ function wasBefore(a, b, amount=0) {
     return a + amount < b;
 }
 
+function firstIndexOfFollowedBy(arr, element, nextElement) {
+    let result = -1;
+    let nextIndex = -1;
+    do {
+        nextIndex = arr.slice(nextIndex + 1).indexOf(element);
+        if (nextIndex !== -1) {
+            result = nextIndex;
+            if (arr[nextIndex + 1] === nextElement) {
+                return nextIndex;
+            }
+        }
+    } while (nextIndex !== -1);
+
+    return result;
+}
+
+function findWebappRoot(filePath) {
+    const pathArr = filePath.split(/[/\\]/);
+    pathArr[0] = filePath[0];
+    const srcIndex = firstIndexOfFollowedBy(pathArr, 'src', 'main');
+    let webappIndex = -1;
+
+    if (srcIndex !== -1 && filePath[srcIndex + 2]) {
+        webappIndex = srcIndex + 2;
+    } else {
+        webappIndex = pathArr.indexOf('webapp');
+    }
+
+    if (webappIndex !== -1) {
+        return path.join(...pathArr.slice(0, webappIndex + 1));
+    } else {
+        return undefined;
+    }
+}
+
+function resolveIncludePath(filePath, includePath) {
+    if (/^[/\\]/.test(includePath)) {
+        const webappDir = findWebappRoot(filePath);
+        if (webappDir) {
+            const result = path.resolve(webappDir, includePath.replace(/^[/\\]/, ''));
+            return Promise.resolve(result);
+        } else {
+            return Promise.reject('No webapp directory found');
+        }
+    } else {
+        // resolve relative path
+        const result = path.resolve(filePath, '..', includePath);
+        return Promise.resolve(result);
+    }
+}
+
 function scanText(text) {
     const infos = {
         taglibDeclarationDirectives: [],
@@ -136,43 +187,43 @@ function restoreOrReadAndCrawl(filePath, includeTrace) {
 }
 
 function crawlAndMergeFileInfos(fileInfos, filePath, includeTrace) {
-    const includePathes = fileInfos.includeDirectives.map(relativeIncludePath => {
-        return path.resolve(filePath, '..', relativeIncludePath);
-    });
+    const subCrawlPromises = fileInfos.includeDirectives
+        .map(includePath => resolveIncludePath(filePath, includePath))
+        .map(resolvePromise => resolvePromise.then(includePath => {
+            // prevent endlessly following cyclic-includes
+            if (includeTrace.includes(includePath)) {
+                return Promise.resolve();
+            }
 
-    const subCrawlPromises = includePathes
-        // prevent endlessly following cyclic-includes
-        .filter(includePath => !includeTrace.includes(includePath))
-        .map(includePath => {
             const newIncludeTrace = [includePath].concat(includeTrace);
-            return restoreOrReadAndCrawl(includePath, newIncludeTrace).catch(err => {
+            const resolvePromise = restoreOrReadAndCrawl(includePath, newIncludeTrace);
+            return resolvePromise.catch(err => {
                 console.error(`Error reading included file ${includePath}:`, err);
             });
+        }));
+
+    return Promise.all(subCrawlPromises)
+        .then(fileInfosList => fileInfosList.filter(infos => !!infos))
+        .then(fileInfosList => {
+            const subIncludesList = fileInfosList.map(infos => infos.includeDirectives);
+            const subDeclarationsList = fileInfosList.map(infos => infos.taglibDeclarationDirectives);
+
+            const allIncludes = fileInfos.includeDirectives.concat(...subIncludesList);
+            const allDeclarations = fileInfos.taglibDeclarationDirectives.concat(...subDeclarationsList);
+
+            return {
+                includeDirectives: allIncludes,
+                taglibDeclarationDirectives: allDeclarations,
+
+                // NOTE: In theory if a file is included, the file declares a taglib by a xml name spaces
+                // declaration and the tag corresponding to the name space declaration is not closed in
+                // this file, the scope of the include would expand to the file including it. But we ignore
+                // those edge case in favor of favor of simplicity and always end the scope of an include
+                // by a xml name space declaration at the end of the file, since we had to allays keep
+                // track of opening and closing tags otherwise.
+                taglibDeclarationNamespaces: fileInfos.taglibDeclarationNamespaces,
+            };
         });
-
-
-    return Promise.all(subCrawlPromises).then(fileInfosList => {
-        fileInfosList = fileInfosList.filter(infos => !!infos);
-
-        const subIncludesList = fileInfosList.map(infos => infos.includeDirectives);
-        const subDeclarationsList = fileInfosList.map(infos => infos.taglibDeclarationDirectives);
-
-        const allIncludes = fileInfos.includeDirectives.concat(...subIncludesList);
-        const allDeclarations = fileInfos.taglibDeclarationDirectives.concat(...subDeclarationsList);
-
-        return {
-            includeDirectives: allIncludes,
-            taglibDeclarationDirectives: allDeclarations,
-
-            // NOTE: In theory if a file is included, the file declares a taglib by a xml name spaces
-            // declaration and the tag corresponding to the name space declaration is not closed in
-            // this file, the scope of the include would expand to the file including it. But we ignore
-            // those edge case in favor of favor of simplicity and always end the scope of an include
-            // by a xml name space declaration at the end of the file, since we had to allays keep
-            // track of opening and closing tags otherwise.
-            taglibDeclarationNamespaces: fileInfos.taglibDeclarationNamespaces,
-        };
-    });
 }
 
 function scanAndCacheAndCrawl(content, filePath, includeTrace) {
@@ -192,9 +243,9 @@ function scanAndCacheAndCrawl(content, filePath, includeTrace) {
  * @returns {Array}
  */
 export function findDeclaredTaglibs(text, filePath) {
-    const scanPromise = filePath ? scanAndCacheAndCrawl(text, filePath, []) : scanText(text);
+    const crawlPromise = filePath ? scanAndCacheAndCrawl(text, filePath, [filePath]) : scanText(text);
 
-    return scanPromise.then(infos => {
+    return crawlPromise.then(infos => {
         const uris = {};
         infos.taglibDeclarationNamespaces.forEach(dec => uris[dec.uri] = dec.prefix);
         infos.taglibDeclarationDirectives.forEach(dec => uris[dec.uri] = dec.prefix);
