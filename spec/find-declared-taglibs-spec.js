@@ -1,5 +1,5 @@
 // jshint jasmine: true
-// jshint maxlen: 120
+// jshint maxlen: 130
 /* globals waitsForPromise */
 
 const utils = require('./spec-utils');
@@ -310,12 +310,17 @@ describe('Find declared taglibs', () => {
                 function watchForChanges(previousLength) {
                     const start = Date.now();
                     resultHasChanged = false;
+
                     (function loop() {
                         findDeclaredTaglibs(editor.getText(), openFile).then(taglibs => {
-                            if (taglibs.length !== previousLength) {
-                                resultHasChanged = true;
-                            } else if (start + 2000 > Date.now()) {
-                                loop();
+                            if (start + 2000 > Date.now()) {
+                                if (taglibs.length !== previousLength) {
+                                    resultHasChanged = true;
+                                } else {
+                                    jasmine.Clock.real.setTimeout.call(this, () => {
+                                        loop();
+                                    }, 80);
+                                }
                             }
                         });
                     })();
