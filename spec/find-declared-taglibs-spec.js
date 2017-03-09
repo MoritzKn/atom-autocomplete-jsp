@@ -337,7 +337,7 @@ describe('Find declared taglibs', () => {
                     }));
                 });
 
-                waitsFor(() => resultHasChanged, 2000);
+                waitsFor('the taglibs to disappear', () => resultHasChanged, 2000);
 
                 waitsForPromise(() => findDeclaredTaglibs(editor.getText(), openFile).then(taglibs => {
                     expect(taglibs.length).toBe(1);
@@ -350,7 +350,7 @@ describe('Find declared taglibs', () => {
                     watchForChanges(taglibs.length);
                 }));
 
-                waitsFor(() => resultHasChanged, 2000);
+                waitsFor('the new taglib to appear', () => resultHasChanged, 2000);
 
                 waitsForPromise(() => findDeclaredTaglibs(editor.getText(), openFile).then(taglibs => {
                     expect(taglibs.length).toBe(2);
