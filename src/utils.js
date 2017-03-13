@@ -2,10 +2,11 @@
 
 /**
  * Tries to get a property from nested objects, but stops if
- * any property on the path isn't an object.
+ * it encounters a property on the path that is something other
+ * then an object.
  *
  * You can use this for example if you want to get `foo.bar.baz`
- * but are not sure if foo.bar` allways exists.
+ * but are not sure if `foo.bar` allways exists.
  * In that case you could use `getDeepPropSave(foo, 'bar', 'baz')`.
  *
  * @param   {*}        obj
@@ -39,11 +40,10 @@ export const attrRegExp = (() => {
 })();
 
 /**
- * Finds all attributes in a XML tag like text
+ * Finds all attributes in a XML tag like string
  *
  * @param   {string}   text
- * @param   {string[]} attributesNames
- * @returns {Object} an object which that maps the attribute names to there values
+ * @returns {Object} an object that maps the attribute names to there values
  */
 export function extractAttributes(text) {
     const attributes = {};
