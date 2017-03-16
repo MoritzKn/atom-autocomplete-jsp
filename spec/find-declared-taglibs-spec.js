@@ -308,13 +308,20 @@ describe('Find declared taglibs', () => {
 
                 let resultHasChanged = false;
                 function watchForChanges(previousLength) {
+                    console.log(`Watch taglibs, currently: ${previousLength}`);
                     const start = Date.now();
                     resultHasChanged = false;
 
                     (function loop() {
+                        console.log(`Scanning`);
+
                         findDeclaredTaglibs(editor.getText(), openFile).then(taglibs => {
+
+                            console.log(`Now ${taglibs.length}`);
+
                             if (start + 2000 > Date.now()) {
                                 if (taglibs.length !== previousLength) {
+                                    console.log(`ResultHasChanged`);
                                     resultHasChanged = true;
                                 } else {
                                     jasmine.Clock.real.setTimeout.call(this, () => {
