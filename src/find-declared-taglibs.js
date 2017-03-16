@@ -169,7 +169,7 @@ function restoreOrReadAndCrawl(filePath, includeTrace) {
         const cachedfileInfos = fileInfosCache[filePath].fileInfos;
         const lastScan = fileInfosCache[filePath].lastScan;
 
-        if (wasBefore(lastScan, Date.now(), 600)) {
+        if (wasBefore(lastScan, Date.now(), 400)) {
             return fileStats(filePath).then(stats => {
                 const lastModified = stats.mtime.getTime();
                 if (wasBefore(lastScan, lastModified)) {
