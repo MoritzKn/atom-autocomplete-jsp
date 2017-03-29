@@ -32,7 +32,7 @@ const contextTests = [{
  * @param   {string} preCursor part of the expression before the cursor
  * @returns {Context}
  */
-function getcompletionContext(preCursor) {
+function getCompletionContext(preCursor) {
     return contextTests.find(test => test.tester(preCursor)).type;
 }
 
@@ -117,7 +117,7 @@ export default {
         const preText = editor.buffer.getTextInRange([[0, 0], bufferPosition]);
 
         return findDeclaredTaglibs(preText, editor.getPath()).then(declaredTaglibs => {
-            const context = getcompletionContext(preCursor);
+            const context = getCompletionContext(preCursor);
             const prefix = replacementPrefix.toLowerCase();
             const validTypes = getTypesForContext(context);
 
