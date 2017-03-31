@@ -11,7 +11,7 @@ function abbreviate(fullName) {
 }
 
 function toShortType(longName) {
-    return longName.match(/([a-zA-Z_][a-zA-Z_0-9\[\]]*)\s*$/)[1];
+    return longName.match(/([a-zA-Z_][a-zA-Z_0-9\[\]]*(?:\.{3})?)\s*$/)[1];
 }
 
 /**
