@@ -62,11 +62,11 @@ mkdir ~/tlds
 * Make sure all [JSTL][jstl] TLDs are in this directory
 ```sh
 cd ~/tlds
-wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/fn.tld
-wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/c.tld
-wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/fmt.tld
-wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/sql.tld
-wget https://svn.java.net/svn/jstl~svn/tags/jstl-1.2/impl/src/main/resources/META-INF/x.tld
+wget https://raw.githubusercontent.com/javaee/jstl-api/master/impl/src/main/resources/META-INF/c.tld
+wget https://raw.githubusercontent.com/javaee/jstl-api/master/impl/src/main/resources/META-INF/fmt.tld
+wget https://raw.githubusercontent.com/javaee/jstl-api/master/impl/src/main/resources/META-INF/fn.tld
+wget https://raw.githubusercontent.com/javaee/jstl-api/master/impl/src/main/resources/META-INF/sql.tld
+wget https://raw.githubusercontent.com/javaee/jstl-api/master/impl/src/main/resources/META-INF/x.tld
 ```
 
 * Copy all of your custom `.tld` files into this directory
