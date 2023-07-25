@@ -7,7 +7,7 @@
     "type": "git",
     "url": "git+ssh://git@github.com/MoritzKn/atom-autocomplete-jsp.git"
   },
-  "author": "Moritz Kneilmann <moritz.kneilmann@gmx.de>",
+  "author": "Moritz Kneilmann",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/MoritzKn/atom-autocomplete-jsp/issues"
